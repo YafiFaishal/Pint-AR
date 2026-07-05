@@ -6,8 +6,9 @@ File untuk mode **Lihat di Meja (AR)** pada modul Tata Surya. Simulasi 3D intera
 
 | File | Platform | Status |
 |------|----------|--------|
-| `solar-system.glb` | Web, Android, WebXR, Scene Viewer | Dibuat otomatis via `npm run generate:solar-ar` |
-| `solar-system.usdz` | iPhone / iOS AR Quick Look | **Harus dikonversi manual** (lihat bawah) |
+| `Solar_system.glb` | Web, Android, WebXR, Scene Viewer | File GLB produksi (AR) |
+| `Solar_system.usdz` | iPhone / iOS AR Quick Look | File USDZ produksi (AR) |
+| `solar-system.glb` / `solar-system.usdz` | — | Legacy orrery dari skrip generator (cadangan) |
 
 ## Isi model (orrery tabletop edukatif)
 
@@ -73,11 +74,11 @@ python3 scripts/ios-animated-usdz/inspect-usdz-animation.py public/models/solar-
 ## Verifikasi
 
 ```bash
-curl -I http://localhost:3000/models/solar-system.glb
-curl -I http://localhost:3000/models/solar-system.usdz
+curl -I http://localhost:3000/models/Solar_system.glb
+curl -I http://localhost:3000/models/Solar_system.usdz
 ```
 
-- **Android:** butuh `solar-system.glb` — animasi orbit via `autoplay` di model-viewer
-- **iPhone Safari:** butuh `solar-system.usdz` untuk AR Quick Look
+- **Android:** butuh `Solar_system.glb`
+- **iPhone Safari:** butuh `Solar_system.usdz` untuk AR Quick Look
 
 Jika file belum ada, aplikasi menampilkan pesan jelas — tidak ada fallback ke model astronaut.

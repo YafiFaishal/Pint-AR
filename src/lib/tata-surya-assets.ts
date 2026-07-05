@@ -3,8 +3,8 @@
  * Simulasi 3D interaktif memakai React Three Fiber — AR memakai file di public/models/.
  */
 
-export const TATA_SURYA_AR_GLB_URL = "/models/solar-system.glb";
-export const TATA_SURYA_AR_USDZ_URL = "/models/solar-system.usdz";
+export const TATA_SURYA_AR_GLB_URL = "/models/Solar_system.glb";
+export const TATA_SURYA_AR_USDZ_URL = "/models/Solar_system.usdz";
 
 export const TATA_SURYA_AR_UNAVAILABLE_MESSAGE =
   "Aset AR Tata Surya belum tersedia. Gunakan simulasi 3D interaktif.";
@@ -16,10 +16,10 @@ export const TATA_SURYA_AR_DESKTOP_HINT =
   "AR tersedia di perangkat mobile. Gunakan simulasi 3D interaktif di desktop.";
 
 export const TATA_SURYA_AR_IOS_HINT =
-  "AR iOS belum tersedia. File solar-system.usdz belum ditambahkan.";
+  "AR iOS belum tersedia. File Solar_system.usdz belum ditambahkan.";
 
 export const TATA_SURYA_AR_GLB_HINT =
-  "Aset AR belum tersedia. Jalankan npm run generate:solar-ar.";
+  "Aset AR belum tersedia. File Solar_system.glb belum ditambahkan.";
 
 export type TataSuryaArAssetStatus = {
   glb: boolean;
