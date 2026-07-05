@@ -43,6 +43,12 @@ export const INSTRUKSI_JATUH_BEBAS_3D = {
     "Atur ketinggian dan gravitasi, pilih mode udara atau hampa, lalu tekan Jatuhkan dan amati waktu jatuh (t) serta kecepatan akhir (v).",
 } as const;
 
+export const INSTRUKSI_REAKSI_KIMIA_3D = {
+  judul: "Simulasi Reaksi Kimia",
+  deskripsi:
+    "Atur volume larutan A dan B, pilih jenis reaksi, lalu tekan Campurkan dan amati perubahan warna, suhu, pH, serta gelembung.",
+} as const;
+
 export const INSTRUKSI_AR = {
   judul: "Arahkan Kamera ke Meja",
   deskripsi:
@@ -61,6 +67,7 @@ export type PanduanLangkahProps = {
   rangkaian?: boolean;
   tataSurya?: boolean;
   jatuhBebas?: boolean;
+  reaksiKimia?: boolean;
 };
 
 export function PanduanLangkah({
@@ -70,6 +77,7 @@ export function PanduanLangkah({
   rangkaian = false,
   tataSurya = false,
   jatuhBebas = false,
+  reaksiKimia = false,
 }: PanduanLangkahProps) {
   const total = langkah.length;
   const [idx, setIdx] = useState(0);
@@ -89,10 +97,11 @@ export function PanduanLangkah({
       if (rangkaian) return INSTRUKSI_RANGKAIAN_3D;
       if (tataSurya) return INSTRUKSI_TATA_SURYA_3D;
       if (jatuhBebas) return INSTRUKSI_JATUH_BEBAS_3D;
+      if (reaksiKimia) return INSTRUKSI_REAKSI_KIMIA_3D;
       return INSTRUKSI_3D;
     }
     return { judul: langkahAktif.judul, deskripsi: langkahAktif.instruksi };
-  }, [langkahAktif, arAktif, newton, rangkaian, tataSurya, jatuhBebas]);
+  }, [langkahAktif, arAktif, newton, rangkaian, tataSurya, jatuhBebas, reaksiKimia]);
 
   if (total === 0) {
     return (

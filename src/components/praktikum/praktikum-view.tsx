@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { ArrowLeft, Rotate3d } from "lucide-react";
 import type { Modul, LangkahPraktikum } from "@/db/schema";
 import { ModelViewer, type ArStatus } from "@/components/model-viewer";
+import { ReaksiKimiaPraktikum } from "@/components/praktikum/reaksi-kimia/reaksi-kimia-praktikum";
 import { JatuhBebasPraktikum } from "@/components/praktikum/jatuh-bebas/jatuh-bebas-praktikum";
 import { NewtonPraktikum } from "@/components/praktikum/newton/newton-praktikum";
 import { RangkaianPraktikum } from "@/components/praktikum/rangkaian/rangkaian-praktikum";
@@ -23,6 +24,7 @@ import {
   isNewtonModul,
   isPraktikumInteraktif,
   isRangkaianModul,
+  isReaksiKimiaModul,
   isTataSuryaModul,
 } from "@/lib/modul-utils";
 import { cn } from "@/lib/utils";
@@ -44,6 +46,7 @@ export function PraktikumView({
   const rangkaian = isRangkaianModul(modul);
   const tataSurya = isTataSuryaModul(modul);
   const jatuhBebas = isJatuhBebasModul(modul);
+  const reaksiKimia = isReaksiKimiaModul(modul);
   const interaktif = isPraktikumInteraktif(modul);
   const belumSiap = isModulBelumSiap(modul);
 
@@ -99,6 +102,18 @@ export function PraktikumView({
   if (jatuhBebas) {
     return (
       <JatuhBebasPraktikum
+        modul={modul}
+        langkah={langkah}
+        arSupported={arTersedia}
+        onArAvailability={setArTersedia}
+        onArStatus={tanganiStatusAr}
+      />
+    );
+  }
+
+  if (reaksiKimia) {
+    return (
+      <ReaksiKimiaPraktikum
         modul={modul}
         langkah={langkah}
         arSupported={arTersedia}

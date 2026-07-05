@@ -23,13 +23,19 @@ export function isJatuhBebasModul(modul: Pick<Modul, "judul">): boolean {
   return judul.includes("jatuh bebas") || judul.includes("gerak jatuh");
 }
 
+/** Modul dengan praktikum 3D interaktif (simulasi reaksi kimia). */
+export function isReaksiKimiaModul(modul: Pick<Modul, "judul">): boolean {
+  return modul.judul.toLowerCase().includes("reaksi kimia");
+}
+
 /** Modul praktikum interaktif (layout mobile khusus). */
 export function isPraktikumInteraktif(modul: Pick<Modul, "judul">): boolean {
   return (
     isNewtonModul(modul) ||
     isRangkaianModul(modul) ||
     isTataSuryaModul(modul) ||
-    isJatuhBebasModul(modul)
+    isJatuhBebasModul(modul) ||
+    isReaksiKimiaModul(modul)
   );
 }
 

@@ -2,6 +2,14 @@
 
 File untuk mode **Lihat di Meja (AR)** pada modul Newton. Simulasi 3D interaktif (slider, Dorong, Reset) tidak memakai file ini.
 
+Modul lain dengan aset AR terpisah:
+
+| Modul | README |
+|-------|--------|
+| Reaksi Kimia | [README-chemistry-reaction.md](./README-chemistry-reaction.md) |
+| Gerak Jatuh Bebas | [README-free-fall.md](./README-free-fall.md) |
+| Tata Surya | [README-solar-system.md](./README-solar-system.md) |
+
 ## File
 
 | File | Platform | Status |

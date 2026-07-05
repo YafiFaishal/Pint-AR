@@ -14,27 +14,26 @@ import {
 import type { LangkahPraktikum, Modul } from "@/db/schema";
 import { cn } from "@/lib/utils";
 import {
-  checkJatuhBebasArAssetsAvailable,
-  getJatuhBebasArButtonState,
-  getJatuhBebasArModelUrls,
-  shouldMountJatuhBebasArViewer,
-  type JatuhBebasArAssetStatus,
-} from "@/lib/jatuh-bebas-assets";
+  checkReaksiKimiaArAssetsAvailable,
+  getReaksiKimiaArButtonState,
+  getReaksiKimiaArModelUrls,
+  shouldMountReaksiKimiaArViewer,
+  type ReaksiKimiaArAssetStatus,
+} from "@/lib/reaksi-kimia-assets";
 import {
-  BATAS_GRAVITASI,
-  BATAS_TINGGI,
-  hitungKecepatanAkhir,
-  hitungKecepatanSaatIni,
-  hitungWaktuJatuh,
-  type ModeJatuh,
-} from "@/lib/jatuh-bebas-utils";
+  BATAS_VOLUME,
+  hitungHasilReaksi,
+  hitungKondisiAwal,
+  namaJenisReaksi,
+  type JenisReaksi,
+} from "@/lib/reaksi-kimia-utils";
 import { PracticumShell } from "@/components/praktikum/practicum-shell";
 import { PanduanLangkah } from "@/components/praktikum/panduan-langkah";
 import { LksPanel } from "@/components/praktikum/lks-panel";
 import { PracticumQuickInfo } from "@/components/praktikum/practicum-quick-info";
-import { JatuhBebasScene } from "./jatuh-bebas-scene";
+import { ReaksiKimiaScene } from "./reaksi-kimia-scene";
 
-type JatuhBebasPraktikumProps = {
+type ReaksiKimiaPraktikumProps = {
   modul: Modul;
   langkah: LangkahPraktikum[];
   arSupported: boolean | null;
@@ -42,42 +41,44 @@ type JatuhBebasPraktikumProps = {
   onArStatus: (status: ArStatus) => void;
 };
 
-export function JatuhBebasPraktikum({
+const PILIHAN_REAKSI: { id: JenisReaksi; label: string }[] = [
+  { id: "netralisasi", label: "Netralisasi" },
+  { id: "eksoterm", label: "Eksoterm" },
+  { id: "indikator", label: "Indikator pH" },
+];
+
+export function ReaksiKimiaPraktikum({
   modul,
   langkah,
   arSupported,
   onArAvailability,
   onArStatus,
-}: JatuhBebasPraktikumProps) {
+}: ReaksiKimiaPraktikumProps) {
   const modelViewerRef = useRef<ModelViewerHandle>(null);
-  const [tinggi, setTinggi] = useState(10);
-  const [gravitasi, setGravitasi] = useState(9.8);
-  const [mode, setMode] = useState<ModeJatuh>("hampa");
-  const [dropSignal, setDropSignal] = useState(0);
+  const [volumeA, setVolumeA] = useState(50);
+  const [volumeB, setVolumeB] = useState(50);
+  const [jenis, setJenis] = useState<JenisReaksi>("netralisasi");
+  const [campurSignal, setCampurSignal] = useState(0);
   const [resetSignal, setResetSignal] = useState(0);
-  const [simState, setSimState] = useState({ elapsed: 0, falling: false });
+  const [sudahCampur, setSudahCampur] = useState(false);
   const [arAktif, setArAktif] = useState(false);
-  const [arAssets, setArAssets] = useState<JatuhBebasArAssetStatus | null>(null);
+  const [arAssets, setArAssets] = useState<ReaksiKimiaArAssetStatus | null>(null);
 
-  const arUrls = getJatuhBebasArModelUrls();
-  const waktuTeoritis = hitungWaktuJatuh(tinggi, gravitasi, mode);
-  const kecepatanTeoritis = hitungKecepatanAkhir(tinggi, gravitasi, mode);
-
-  const tampilanWaktu = simState.falling ? simState.elapsed : waktuTeoritis;
-  const tampilanKecepatan = simState.falling
-    ? hitungKecepatanSaatIni(gravitasi, mode, simState.elapsed)
-    : kecepatanTeoritis;
+  const arUrls = getReaksiKimiaArModelUrls();
+  const kondisiAwal = hitungKondisiAwal(jenis);
+  const hasilTarget = hitungHasilReaksi(volumeA, volumeB, jenis);
+  const tampilan = sudahCampur ? hasilTarget : kondisiAwal;
 
   const arTombol = useMemo(
-    () => getJatuhBebasArButtonState(arAssets),
+    () => getReaksiKimiaArButtonState(arAssets),
     [arAssets],
   );
-  const arViewerSiap = shouldMountJatuhBebasArViewer(arAssets);
+  const arViewerSiap = shouldMountReaksiKimiaArViewer(arAssets);
   const arTombolAktif = arTombol.aktif && arSupported !== false;
 
   useEffect(() => {
     let aktif = true;
-    checkJatuhBebasArAssetsAvailable().then((status) => {
+    checkReaksiKimiaArAssetsAvailable().then((status) => {
       if (aktif) setArAssets(status);
     });
     return () => {
@@ -85,20 +86,20 @@ export function JatuhBebasPraktikum({
     };
   }, []);
 
-  const handleSimUpdate = useCallback(
-    (state: { elapsed: number; falling: boolean }) => {
-      setSimState(state);
-    },
-    [],
-  );
-
-  const handleJatuhkan = useCallback(() => {
-    setDropSignal((n) => n + 1);
+  const handleCampurkan = useCallback(() => {
+    setSudahCampur(true);
+    setCampurSignal((n) => n + 1);
   }, []);
 
   const handleReset = useCallback(() => {
+    setSudahCampur(false);
     setResetSignal((n) => n + 1);
-    setSimState({ elapsed: 0, falling: false });
+  }, []);
+
+  const handleJenisChange = useCallback((baru: JenisReaksi) => {
+    setJenis(baru);
+    setSudahCampur(false);
+    setResetSignal((n) => n + 1);
   }, []);
 
   const handleArStatus = useCallback(
@@ -130,13 +131,14 @@ export function JatuhBebasPraktikum({
 
   const scene = (
     <>
-      <JatuhBebasScene
-        tinggi={tinggi}
-        gravitasi={gravitasi}
-        mode={mode}
-        dropSignal={dropSignal}
+      <ReaksiKimiaScene
+        volumeA={volumeA}
+        volumeB={volumeB}
+        jenis={jenis}
+        campurSignal={campurSignal}
         resetSignal={resetSignal}
-        onSimUpdate={handleSimUpdate}
+        hasilTarget={hasilTarget}
+        sudahCampur={sudahCampur}
       />
       {arViewerSiap ? (
         <div className="sr-only" aria-hidden>
@@ -146,7 +148,7 @@ export function JatuhBebasPraktikum({
             iosSrc={arAssets?.usdz ? arUrls.usdz : undefined}
             alt={`Model AR: ${modul.judul}`}
             autoRotate={false}
-            autoplay
+            autoplay={false}
             onArAvailability={onArAvailability}
             onArStatus={handleArStatus}
           />
@@ -159,70 +161,67 @@ export function JatuhBebasPraktikum({
     <div className="space-y-1.5 lg:space-y-3">
       <div className="space-y-1">
         <div className="flex items-center justify-between text-xs">
-          <span className="font-medium">Ketinggian (h)</span>
-          <span className="text-muted-foreground tabular-nums">{tinggi} m</span>
+          <span className="font-medium">Volume larutan A</span>
+          <span className="text-muted-foreground tabular-nums">{volumeA} mL</span>
         </div>
         <Slider
-          min={BATAS_TINGGI.min}
-          max={BATAS_TINGGI.max}
-          step={0.5}
-          value={[tinggi]}
-          onValueChange={(v) => setTinggi(Array.isArray(v) ? v[0] : v)}
+          min={BATAS_VOLUME.min}
+          max={BATAS_VOLUME.max}
+          step={5}
+          value={[volumeA]}
+          onValueChange={(v) => setVolumeA(Array.isArray(v) ? v[0] : v)}
         />
       </div>
 
       <div className="space-y-1">
         <div className="flex items-center justify-between text-xs">
-          <span className="font-medium">Gravitasi (g)</span>
-          <span className="text-muted-foreground tabular-nums">
-            {gravitasi.toFixed(1)} m/s²
-          </span>
+          <span className="font-medium">Volume larutan B</span>
+          <span className="text-muted-foreground tabular-nums">{volumeB} mL</span>
         </div>
         <Slider
-          min={BATAS_GRAVITASI.min}
-          max={BATAS_GRAVITASI.max}
-          step={0.1}
-          value={[gravitasi]}
-          onValueChange={(v) => setGravitasi(Array.isArray(v) ? v[0] : v)}
+          min={BATAS_VOLUME.min}
+          max={BATAS_VOLUME.max}
+          step={5}
+          value={[volumeB]}
+          onValueChange={(v) => setVolumeB(Array.isArray(v) ? v[0] : v)}
         />
       </div>
 
       <div className="space-y-1">
-        <span className="text-xs font-medium">Lingkungan</span>
-        <div className="grid grid-cols-2 gap-1.5">
-          <Button
-            type="button"
-            variant={mode === "udara" ? "default" : "outline"}
-            className="min-h-9 text-xs"
-            onClick={() => setMode("udara")}
-          >
-            Udara
-          </Button>
-          <Button
-            type="button"
-            variant={mode === "hampa" ? "default" : "outline"}
-            className="min-h-9 text-xs"
-            onClick={() => setMode("hampa")}
-          >
-            Hampa
-          </Button>
+        <span className="text-xs font-medium">Jenis reaksi</span>
+        <div className="grid grid-cols-1 gap-1.5 min-[420px]:grid-cols-3">
+          {PILIHAN_REAKSI.map(({ id, label }) => (
+            <Button
+              key={id}
+              type="button"
+              variant={jenis === id ? "default" : "outline"}
+              className="min-h-9 text-xs"
+              onClick={() => handleJenisChange(id)}
+            >
+              {label}
+            </Button>
+          ))}
         </div>
       </div>
 
-      <div className="flex items-center justify-between gap-2 rounded-md border bg-muted/30 px-2.5 py-1.5 text-[11px] lg:text-xs">
-        <span className="tabular-nums">
-          <span className="font-medium text-muted-foreground">t </span>
-          {tampilanWaktu.toFixed(2)} s
-        </span>
-        <span className="tabular-nums">
-          <span className="font-medium text-muted-foreground">v </span>
-          {tampilanKecepatan.toFixed(1)} m/s
-        </span>
+      <div className="grid grid-cols-3 gap-1.5 rounded-md border bg-muted/30 px-2 py-1.5 text-[10px] lg:text-[11px]">
+        <div className="text-center">
+          <p className="text-muted-foreground">pH</p>
+          <p className="font-semibold tabular-nums">{tampilan.ph.toFixed(1)}</p>
+        </div>
+        <div className="text-center">
+          <p className="text-muted-foreground">Suhu</p>
+          <p className="font-semibold tabular-nums">{tampilan.suhu.toFixed(0)}°C</p>
+        </div>
+        <div className="text-center">
+          <p className="text-muted-foreground">Status</p>
+          <p className="truncate font-semibold">{tampilan.status}</p>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-2">
-        <Button className="min-h-10 lg:min-h-11" onClick={handleJatuhkan}>
-          Jatuhkan
+        <Button className="min-h-10 lg:min-h-11" onClick={handleCampurkan}>
+          Campurkan
         </Button>
         <Button
           className="min-h-10 lg:min-h-11"
@@ -270,17 +269,21 @@ export function JatuhBebasPraktikum({
         <PracticumQuickInfo
           columns={4}
           items={[
-            { key: "h", label: "h", value: `${tinggi} m` },
-            { key: "g", label: "g", value: `${gravitasi.toFixed(1)} m/s²` },
+            { key: "ph", label: "pH", value: tampilan.ph.toFixed(1) },
             {
-              key: "t",
-              label: "t",
-              value: `${tampilanWaktu.toFixed(2)} s`,
+              key: "suhu",
+              label: "Suhu",
+              value: `${tampilan.suhu.toFixed(0)}°C`,
             },
             {
-              key: "v",
-              label: "v",
-              value: `${tampilanKecepatan.toFixed(1)} m/s`,
+              key: "warna",
+              label: "Warna",
+              value: tampilan.labelWarna,
+            },
+            {
+              key: "jenis",
+              label: "Reaksi",
+              value: namaJenisReaksi(jenis),
             },
           ]}
         />
@@ -289,7 +292,7 @@ export function JatuhBebasPraktikum({
       mobileSheetPadding="large"
       controls={controls}
       guide={
-        <PanduanLangkah langkah={langkah} arAktif={arAktif} jatuhBebas />
+        <PanduanLangkah langkah={langkah} arAktif={arAktif} reaksiKimia />
       }
       lks={<LksPanel moduleId={modul.id} />}
       arButton={arButton}
