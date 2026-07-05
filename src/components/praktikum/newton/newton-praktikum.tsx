@@ -118,6 +118,8 @@ export function NewtonPraktikum({
               src={arUrls.glb}
               iosSrc={arAssets?.usdz ? arUrls.usdz : undefined}
               alt={`Model AR: ${modul.judul}`}
+              autoRotate={false}
+              autoplay
               onArAvailability={onArAvailability}
               onArStatus={handleArStatus}
             />

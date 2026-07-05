@@ -2,31 +2,109 @@
 
 import { useEffect, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Html, OrbitControls } from "@react-three/drei";
+import { ContactShadows, OrbitControls, RoundedBox } from "@react-three/drei";
+import * as THREE from "three";
 import type { Group } from "three";
 
-const AWAL_BLOK = -2.5;
-const AKHIR_LINTASAN = 2.5;
+/* ── Tata letak lintasan (meter, terpusat di origin) ── */
+const PANJANG_LINTASAN = 4.8;
+const LEBAR_LINTASAN = 0.95;
+const TINGGI_LINTASAN = 0.11;
+const AWAL_BLOK = -1.35;
+const AKHIR_LINTASAN = 1.35;
+
+const MAT_LINTASAN = {
+  color: "#64748b",
+  metalness: 0.12,
+  roughness: 0.52,
+} as const;
+
+const MAT_LINTASAN_ATAS = {
+  color: "#94a3b8",
+  metalness: 0.08,
+  roughness: 0.48,
+} as const;
+
+const MAT_BALOK = {
+  color: "#1d4ed8",
+  metalness: 0.22,
+  roughness: 0.42,
+} as const;
+
+const MAT_PANAH = {
+  color: "#dc2626",
+  metalness: 0.15,
+  roughness: 0.5,
+} as const;
 
 function Lintasan() {
   return (
-    <mesh position={[0, 0, 0]} receiveShadow>
-      <boxGeometry args={[8, 0.1, 1.4]} />
-      <meshStandardMaterial color="#94a3b8" />
-    </mesh>
+    <group position={[0, TINGGI_LINTASAN / 2 - 0.01, 0]}>
+      <RoundedBox
+        args={[PANJANG_LINTASAN, TINGGI_LINTASAN, LEBAR_LINTASAN]}
+        radius={0.02}
+        smoothness={4}
+        castShadow
+        receiveShadow
+      >
+        <meshStandardMaterial {...MAT_LINTASAN} />
+      </RoundedBox>
+
+      {/* Permukaan atas sedikit lebih terang */}
+      <mesh position={[0, TINGGI_LINTASAN / 2 + 0.003, 0]} receiveShadow>
+        <boxGeometry args={[PANJANG_LINTASAN - 0.12, 0.006, LEBAR_LINTASAN - 0.1]} />
+        <meshStandardMaterial {...MAT_LINTASAN_ATAS} />
+      </mesh>
+
+      {/* Garis arah gerak */}
+      <mesh position={[0, TINGGI_LINTASAN / 2 + 0.006, 0]} receiveShadow>
+        <boxGeometry args={[PANJANG_LINTASAN - 0.5, 0.004, 0.03]} />
+        <meshStandardMaterial color="#475569" roughness={0.7} />
+      </mesh>
+
+      {/* Ujung lintasan */}
+      {([-1, 1] as const).map((sisi) => (
+        <mesh
+          key={sisi}
+          position={[sisi * (PANJANG_LINTASAN / 2 - 0.04), TINGGI_LINTASAN / 2 + 0.005, 0]}
+          receiveShadow
+        >
+          <boxGeometry args={[0.06, 0.008, LEBAR_LINTASAN - 0.14]} />
+          <meshStandardMaterial color="#334155" roughness={0.75} />
+        </mesh>
+      ))}
+
+      {/* Kaki karet */}
+      {(
+        [
+          [-1.95, -0.055, 0.32],
+          [1.95, -0.055, 0.32],
+          [-1.95, -0.055, -0.32],
+          [1.95, -0.055, -0.32],
+        ] as [number, number, number][]
+      ).map((p, i) => (
+        <mesh key={i} position={p} castShadow>
+          <cylinderGeometry args={[0.035, 0.04, 0.022, 10]} />
+          <meshStandardMaterial color="#1e293b" roughness={0.85} />
+        </mesh>
+      ))}
+    </group>
   );
 }
 
 function PanahGaya({ panjang }: { panjang: number }) {
+  const kepala = 0.14;
+  const batang = Math.max(panjang - kepala * 0.55, 0.12);
+
   return (
-    <group position={[0.05, 0, 0.35]}>
-      <mesh rotation={[0, 0, -Math.PI / 2]} position={[panjang / 2, 0, 0]}>
-        <cylinderGeometry args={[0.04, 0.04, panjang, 8]} />
-        <meshStandardMaterial color="#ef4444" />
+    <group position={[0.02, 0, 0.22]}>
+      <mesh rotation={[0, 0, -Math.PI / 2]} position={[batang / 2, 0, 0]} castShadow>
+        <cylinderGeometry args={[0.028, 0.032, batang, 10]} />
+        <meshStandardMaterial {...MAT_PANAH} />
       </mesh>
-      <mesh rotation={[0, 0, -Math.PI / 2]} position={[panjang + 0.12, 0, 0]}>
-        <coneGeometry args={[0.1, 0.22, 8]} />
-        <meshStandardMaterial color="#ef4444" />
+      <mesh rotation={[0, 0, -Math.PI / 2]} position={[batang + kepala * 0.42, 0, 0]} castShadow>
+        <coneGeometry args={[0.065, kepala, 10]} />
+        <meshStandardMaterial {...MAT_PANAH} />
       </mesh>
     </group>
   );
@@ -47,17 +125,19 @@ function BalokDenganGaya({
   const vel = useRef(0);
   const pos = useRef(AWAL_BLOK);
   const animating = useRef(false);
+  const resetting = useRef(false);
   const lastPush = useRef(0);
   const lastReset = useRef(0);
 
-  const blockScale = 0.3 + mass * 0.03;
-  const panjangPanah = 0.35 + (force / 50) * 1.4;
+  const blockScale = 0.28 + mass * 0.028;
+  const panjangPanah = 0.38 + (force / 50) * 0.95;
 
   useEffect(() => {
     if (pushSignal > lastPush.current) {
       lastPush.current = pushSignal;
+      resetting.current = false;
       animating.current = true;
-      vel.current = (force / mass) * 0.25;
+      vel.current = (force / mass) * 0.32;
     }
   }, [pushSignal, force, mass]);
 
@@ -66,52 +146,93 @@ function BalokDenganGaya({
       lastReset.current = resetSignal;
       animating.current = false;
       vel.current = 0;
-      pos.current = AWAL_BLOK;
+      resetting.current = true;
     }
   }, [resetSignal]);
 
   useFrame((_, dt) => {
     if (!groupRef.current) return;
-    if (animating.current) {
+
+    if (resetting.current) {
+      pos.current = THREE.MathUtils.lerp(pos.current, AWAL_BLOK, Math.min(dt * 7, 1));
+      if (Math.abs(pos.current - AWAL_BLOK) < 0.008) {
+        pos.current = AWAL_BLOK;
+        resetting.current = false;
+      }
+    } else if (animating.current) {
       const a = force / mass;
-      vel.current += a * dt * 0.35;
+      vel.current += a * dt * 0.42;
       pos.current += vel.current * dt;
+
       if (pos.current >= AKHIR_LINTASAN) {
         pos.current = AKHIR_LINTASAN;
         animating.current = false;
+        vel.current *= 0.35;
       }
     }
+
     groupRef.current.position.x = pos.current;
   });
 
-  const y = 0.05 + blockScale / 2;
+  const y = TINGGI_LINTASAN / 2 + blockScale / 2 + 0.01;
 
   return (
     <group ref={groupRef} position={[AWAL_BLOK, y, 0]}>
-      <mesh castShadow position={[0, 0, 0]}>
-        <boxGeometry args={[blockScale, blockScale, blockScale]} />
-        <meshStandardMaterial color="#2563eb" />
+      <RoundedBox
+        args={[blockScale, blockScale, blockScale]}
+        radius={0.018}
+        smoothness={4}
+        castShadow
+      >
+        <meshStandardMaterial {...MAT_BALOK} />
+      </RoundedBox>
+
+      {/* Highlight tepi atas */}
+      <mesh position={[0, blockScale / 2 - 0.008, 0]}>
+        <boxGeometry args={[blockScale * 0.82, 0.012, blockScale * 0.82]} />
+        <meshStandardMaterial color="#3b82f6" metalness={0.1} roughness={0.35} />
       </mesh>
-      <group position={[blockScale / 2, 0, 0]}>
+
+      <group position={[blockScale / 2 + 0.01, 0, 0]}>
         <PanahGaya panjang={panjangPanah} />
       </group>
     </group>
   );
 }
 
-function LabelTeks({
-  position,
-  children,
+function HudNilai({
+  force,
+  mass,
+  acceleration,
 }: {
-  position: [number, number, number];
-  children: React.ReactNode;
+  force: number;
+  mass: number;
+  acceleration: number;
 }) {
+  const items = [
+    { label: "F", value: `${force} N` },
+    { label: "m", value: `${mass} kg` },
+    { label: "a", value: `${acceleration.toFixed(2)} m/s²` },
+  ] as const;
+
   return (
-    <Html position={position} center distanceFactor={6}>
-      <div className="whitespace-nowrap rounded-md border bg-background/95 px-2 py-1 text-xs font-medium shadow-sm">
-        {children}
+    <div className="pointer-events-none absolute inset-x-0 top-2 z-10 flex justify-center px-2 lg:top-3">
+      <div className="grid w-full max-w-xs grid-cols-3 gap-1 lg:max-w-sm lg:gap-1.5">
+        {items.map(({ label, value }) => (
+          <div
+            key={label}
+            className="rounded-md border bg-background/90 px-1 py-0.5 text-center shadow-sm backdrop-blur-sm lg:px-2 lg:py-1"
+          >
+            <p className="text-[9px] font-medium text-muted-foreground lg:text-[10px]">
+              {label}
+            </p>
+            <p className="text-[10px] font-semibold tabular-nums lg:text-xs">
+              {value}
+            </p>
+          </div>
+        ))}
       </div>
-    </Html>
+    </div>
   );
 }
 
@@ -129,38 +250,54 @@ export function NewtonScene({
   resetSignal: number;
 }) {
   return (
-    <Canvas
-      shadows
-      camera={{ position: [0, 2.2, 4.5], fov: 42 }}
-      className="h-full w-full touch-none"
-      gl={{ antialias: true, alpha: true }}
-    >
-      <color attach="background" args={["#f1f5f9"]} />
-      <ambientLight intensity={0.65} />
-      <directionalLight position={[4, 6, 3]} intensity={1.1} castShadow />
-      <OrbitControls
-        enablePan={false}
-        minDistance={3}
-        maxDistance={8}
-        maxPolarAngle={Math.PI / 2.1}
-        target={[0, 0.2, 0]}
-      />
-      <Lintasan />
-      <BalokDenganGaya
-        mass={mass}
-        force={force}
-        pushSignal={pushSignal}
-        resetSignal={resetSignal}
-      />
-      <LabelTeks position={[-3, 1.6, 0]}>
-        F = {force} N
-      </LabelTeks>
-      <LabelTeks position={[0, 1.6, 0]}>
-        m = {mass} kg
-      </LabelTeks>
-      <LabelTeks position={[3, 1.6, 0]}>
-        a = {acceleration.toFixed(2)} m/s²
-      </LabelTeks>
-    </Canvas>
+    <div className="relative h-full w-full">
+      <HudNilai force={force} mass={mass} acceleration={acceleration} />
+
+      <Canvas
+        shadows
+        camera={{ position: [1.65, 1.55, 3.15], fov: 38 }}
+        className="h-full w-full touch-none"
+        gl={{ antialias: true, alpha: true }}
+      >
+        <color attach="background" args={["#f1f5f9"]} />
+        <ambientLight intensity={0.52} />
+        <directionalLight
+          position={[3.5, 5.5, 4]}
+          intensity={1.05}
+          castShadow
+          shadow-mapSize-width={1024}
+          shadow-mapSize-height={1024}
+        />
+        <directionalLight position={[-2.5, 3, -1.5]} intensity={0.22} />
+
+        <OrbitControls
+          enablePan={false}
+          minDistance={2.4}
+          maxDistance={5.5}
+          minPolarAngle={Math.PI / 5.5}
+          maxPolarAngle={Math.PI / 2.15}
+          minAzimuthAngle={-Math.PI / 2.8}
+          maxAzimuthAngle={Math.PI / 2.8}
+          target={[0, 0.16, 0]}
+        />
+
+        <Lintasan />
+        <BalokDenganGaya
+          mass={mass}
+          force={force}
+          pushSignal={pushSignal}
+          resetSignal={resetSignal}
+        />
+
+        <ContactShadows
+          position={[0, 0.001, 0]}
+          opacity={0.32}
+          scale={7}
+          blur={2.2}
+          far={2.5}
+          color="#334155"
+        />
+      </Canvas>
+    </div>
   );
 }
