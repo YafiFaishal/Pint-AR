@@ -62,6 +62,38 @@ async function seed() {
       instruksi:
         "Sentuh benda untuk memberi dorongan, lalu amati perubahan gerakannya.",
     },
+    {
+      id: randomUUID(),
+      modulId: modulRangkaId,
+      urutan: 1,
+      judul: "Amati Komponen Rangkaian",
+      instruksi:
+        "Perhatikan komponen utama seperti baterai, kabel, saklar, dan lampu. Putar model 3D untuk melihat posisi setiap bagian.",
+    },
+    {
+      id: randomUUID(),
+      modulId: modulRangkaId,
+      urutan: 2,
+      judul: "Pahami Rangkaian Terbuka",
+      instruksi:
+        "Saat saklar terbuka, jalur listrik terputus sehingga arus tidak dapat mengalir dan lampu tidak menyala.",
+    },
+    {
+      id: randomUUID(),
+      modulId: modulRangkaId,
+      urutan: 3,
+      judul: "Pahami Rangkaian Tertutup",
+      instruksi:
+        "Saat saklar tertutup, jalur listrik tersambung sehingga arus dapat mengalir dari baterai melalui kabel dan lampu menyala.",
+    },
+    {
+      id: randomUUID(),
+      modulId: modulRangkaId,
+      urutan: 4,
+      judul: "Catat Hasil Pengamatan",
+      instruksi:
+        "Isi LKS berdasarkan pengamatanmu. Jelaskan mengapa lampu hanya menyala saat rangkaian tertutup.",
+    },
   ]);
 
   await db.insert(lksTemplate).values([
@@ -83,6 +115,26 @@ async function seed() {
       modulId: modulRangkaId,
       urutan: 1,
       pertanyaan: "Apakah lampu menyala saat rangkaian terhubung? Mengapa?",
+    },
+    {
+      id: randomUUID(),
+      modulId: modulRangkaId,
+      urutan: 2,
+      pertanyaan: "Apa yang terjadi jika saklar terbuka?",
+    },
+    {
+      id: randomUUID(),
+      modulId: modulRangkaId,
+      urutan: 3,
+      pertanyaan:
+        "Mengapa arus listrik hanya dapat mengalir pada rangkaian tertutup?",
+    },
+    {
+      id: randomUUID(),
+      modulId: modulRangkaId,
+      urutan: 4,
+      pertanyaan:
+        "Menurutmu, apa fungsi baterai dalam rangkaian listrik sederhana?",
     },
   ]);
 

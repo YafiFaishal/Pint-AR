@@ -33,7 +33,10 @@ export function LksPanel({ moduleId }: { moduleId: string }) {
 
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const jawabanRef = useRef(jawaban);
-  jawabanRef.current = jawaban;
+
+  useEffect(() => {
+    jawabanRef.current = jawaban;
+  }, [jawaban]);
 
   const storageKey = `lks:${moduleId}`;
 

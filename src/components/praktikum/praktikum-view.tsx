@@ -13,8 +13,13 @@ import {
 import type { Modul, LangkahPraktikum } from "@/db/schema";
 import { ModelViewer, type ArStatus } from "@/components/model-viewer";
 import { NewtonPraktikum } from "@/components/praktikum/newton/newton-praktikum";
+import { RangkaianPraktikum } from "@/components/praktikum/rangkaian/rangkaian-praktikum";
 import { LksPanel } from "@/components/praktikum/lks-panel";
-import { isNewtonModul } from "@/lib/modul-utils";
+import {
+  isNewtonModul,
+  isPraktikumInteraktif,
+  isRangkaianModul,
+} from "@/lib/modul-utils";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -33,6 +38,13 @@ const INSTRUKSI_NEWTON_3D = {
   judul: "Simulasi Gaya & Gerak",
   deskripsi:
     "Atur massa dan gaya dengan slider, baca percepatan (a = F/m), lalu tekan Dorong untuk menggerakkan balok di lintasan.",
+} as const;
+
+/** Instruksi praktikum interaktif Rangkaian Listrik (mode 3D, bukan AR). */
+const INSTRUKSI_RANGKAIAN_3D = {
+  judul: "Simulasi Rangkaian Listrik",
+  deskripsi:
+    "Nyalakan saklar, atur tegangan dan hambatan, lalu amati arus (I = V/R) serta lampu yang menyala saat rangkaian tertutup.",
 } as const;
 
 /** Instruksi global saat sesi AR aktif (setelah tombol "Lihat di Meja"). */
@@ -59,6 +71,8 @@ export function PraktikumView({
   const [arAktif, setArAktif] = useState(false);
   const arGagalRef = useRef(false);
   const newton = isNewtonModul(modul);
+  const rangkaian = isRangkaianModul(modul);
+  const interaktif = isPraktikumInteraktif(modul);
 
   function tanganiStatusAr(status: ArStatus) {
     if (status === "session-started" || status === "object-placed") {
@@ -92,7 +106,7 @@ export function PraktikumView({
         <ModeBadge
           arTersedia={arTersedia}
           arAktif={arAktif}
-          interaktif={newton && !arAktif}
+          interaktif={interaktif && !arAktif}
         />
       </header>
 
@@ -101,13 +115,22 @@ export function PraktikumView({
         <section
           className={cn(
             "relative shrink-0 bg-gradient-to-b from-muted/60 to-muted",
-            newton
-              ? "h-[min(60svh,calc(100svh-3.5rem-34svh))] max-h-[62svh] min-h-0 max-lg:overflow-hidden lg:h-auto lg:max-h-none lg:min-h-0 lg:flex-1"
-              : "h-[45vh] lg:h-auto lg:flex-1",
+            newton &&
+              "h-[min(60svh,calc(100svh-3.5rem-34svh))] max-h-[62svh] min-h-0 max-lg:overflow-hidden lg:h-auto lg:max-h-none lg:min-h-0 lg:flex-1",
+            rangkaian &&
+              "max-lg:h-auto max-lg:overflow-visible lg:h-auto lg:min-h-0 lg:flex-1",
+            !interaktif && "h-[45vh] lg:h-auto lg:flex-1",
           )}
         >
           {newton ? (
             <NewtonPraktikum
+              modul={modul}
+              arSupported={arTersedia}
+              onArAvailability={setArTersedia}
+              onArStatus={tanganiStatusAr}
+            />
+          ) : rangkaian ? (
+            <RangkaianPraktikum
               modul={modul}
               arSupported={arTersedia}
               onArAvailability={setArTersedia}
@@ -128,7 +151,7 @@ export function PraktikumView({
             </div>
           )}
 
-          {!newton ? (
+          {!interaktif ? (
             <ModeInstruksiOverlay
               arAktif={arAktif}
               arTersedia={arTersedia}
@@ -140,9 +163,11 @@ export function PraktikumView({
         <aside
           className={cn(
             "flex min-h-0 flex-col overflow-hidden border-t lg:max-w-md lg:border-l lg:border-t-0",
-            newton
-              ? "max-h-[min(36svh,calc(100svh-3.5rem-48svh))] flex-1 min-h-0 max-lg:shrink lg:max-h-none lg:min-h-0 lg:flex-1"
-              : "flex-1",
+            newton &&
+              "max-h-[min(36svh,calc(100svh-3.5rem-48svh))] flex-1 min-h-0 max-lg:shrink lg:max-h-none lg:min-h-0 lg:flex-1",
+            rangkaian &&
+              "max-lg:mt-1 max-lg:flex-1 max-lg:min-h-0 max-lg:shrink lg:max-h-none lg:min-h-0 lg:flex-1",
+            !interaktif && "flex-1",
           )}
         >
           <Tabs
@@ -152,7 +177,7 @@ export function PraktikumView({
             <div
               className={cn(
                 "shrink-0 px-4 pt-3",
-                newton && "max-lg:px-3 max-lg:pt-2",
+                interaktif && "max-lg:px-3 max-lg:pt-2",
               )}
             >
               <TabsList className="grid w-full grid-cols-2">
@@ -165,13 +190,14 @@ export function PraktikumView({
               value="panduan"
               className={cn(
                 "min-h-0 flex-1 overflow-y-auto p-4",
-                newton && "max-lg:p-3",
+                interaktif && "max-lg:p-3",
               )}
             >
               <PanduanLangkah
                 langkah={langkah}
                 arAktif={arAktif}
                 newton={newton}
+                rangkaian={rangkaian}
               />
             </TabsContent>
 
@@ -179,7 +205,7 @@ export function PraktikumView({
               value="lks"
               className={cn(
                 "min-h-0 flex-1 overflow-y-auto p-4",
-                newton && "max-lg:p-3",
+                interaktif && "max-lg:p-3",
               )}
             >
               <LksPanel moduleId={modul.id} />
@@ -195,10 +221,12 @@ function PanduanLangkah({
   langkah,
   arAktif,
   newton,
+  rangkaian,
 }: {
   langkah: LangkahPraktikum[];
   arAktif: boolean;
   newton: boolean;
+  rangkaian: boolean;
 }) {
   const total = langkah.length;
   const [idx, setIdx] = useState(0);
@@ -215,10 +243,12 @@ function PanduanLangkah({
     if (!langkahAktif) return null;
     if (isLangkahPenempatanAr(langkahAktif)) {
       if (arAktif) return INSTRUKSI_AR;
-      return newton ? INSTRUKSI_NEWTON_3D : INSTRUKSI_3D;
+      if (newton) return INSTRUKSI_NEWTON_3D;
+      if (rangkaian) return INSTRUKSI_RANGKAIAN_3D;
+      return INSTRUKSI_3D;
     }
     return { judul: langkahAktif.judul, deskripsi: langkahAktif.instruksi };
-  }, [langkahAktif, arAktif, newton]);
+  }, [langkahAktif, arAktif, newton, rangkaian]);
 
   if (total === 0) {
     return (

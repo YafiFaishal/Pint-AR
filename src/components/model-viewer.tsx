@@ -36,6 +36,8 @@ export interface ModelViewerProps {
   ar?: boolean;
   /** Putar objek otomatis saat diam. */
   autoRotate?: boolean;
+  /** Putar animasi GLB otomatis (loop). */
+  autoplay?: boolean;
   poster?: string;
   /** Label tombol AR kustom. */
   arButtonLabel?: string;
@@ -69,6 +71,7 @@ export const ModelViewer = forwardRef<ModelViewerHandle, ModelViewerProps>(
       alt = "Model 3D alat lab",
       ar = true,
       autoRotate = true,
+      autoplay = false,
       poster,
       arButtonLabel = "Lihat di Meja (AR)",
       onArAvailability,
@@ -101,6 +104,16 @@ export const ModelViewer = forwardRef<ModelViewerHandle, ModelViewerProps>(
       mounted = false;
     };
   }, []);
+
+  useEffect(() => {
+    const el = elRef.current;
+    if (!el || !ready) return;
+    if (autoplay) {
+      el.setAttribute("autoplay", "");
+    } else {
+      el.removeAttribute("autoplay");
+    }
+  }, [ready, autoplay]);
 
   const handleRef = useCallback(
     (node: HTMLElement | null) => {
