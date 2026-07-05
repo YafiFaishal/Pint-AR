@@ -10,7 +10,7 @@ export const TATA_SURYA_AR_UNAVAILABLE_MESSAGE =
   "Aset AR Tata Surya belum tersedia. Gunakan simulasi 3D interaktif.";
 
 export const TATA_SURYA_AR_IOS_UNAVAILABLE_MESSAGE =
-  "Aset AR iOS Tata Surya belum tersedia. Konversi solar-system.usdz dari GLB (lihat public/models/README-solar-system.md).";
+  "Aset AR iOS Tata Surya belum tersedia. Tambahkan file USDZ untuk Quick Look.";
 
 export const TATA_SURYA_AR_DESKTOP_HINT =
   "AR tersedia di perangkat mobile. Gunakan simulasi 3D interaktif di desktop.";

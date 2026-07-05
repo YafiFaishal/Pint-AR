@@ -9,9 +9,27 @@ File untuk mode **Lihat di Meja (AR)** pada modul Tata Surya. Simulasi 3D intera
 | `solar-system.glb` | Web, Android, WebXR, Scene Viewer | Dibuat otomatis via `npm run generate:solar-ar` |
 | `solar-system.usdz` | iPhone / iOS AR Quick Look | **Harus dikonversi manual** (lihat bawah) |
 
-Isi model: Matahari di tengah, orbit tipis, Merkurius · Bumi (+ Bulan) · Mars · Jupiter — terpusat di origin, ukuran cocok untuk meja.
+## Isi model (orrery tabletop edukatif)
 
-Animasi GLB (bonus): planet mengorbit Matahari, Bulan mengorbit Bumi.
+- Alas bundar gelap + tiang pusat
+- Matahari di tengah (glow/pulse ringan)
+- 4 planet: Merkurius, Bumi (+ Bulan), Mars, Jupiter
+- Orbit ring tipis statis per planet + orbit Bulan kecil
+- **Bukan skala riil** — planet terlihat jelas, semua muat satu frame meja
+- **Tanpa** sky sphere / background sphere
+- Terpusat di origin
+
+## Animasi GLB (`TataSuryaOrbit`, loop 12 detik)
+
+| Objek | Perilaku |
+|-------|----------|
+| Merkurius | Orbit paling cepat |
+| Bumi | Orbit sedang |
+| Mars | Orbit lebih lambat |
+| Jupiter | Orbit paling lambat |
+| Bulan | Orbit cepat mengelilingi Bumi |
+| Halo Matahari | Pulse scale ringan |
+| Orbit ring | Statis |
 
 ## Regenerasi GLB
 
@@ -23,7 +41,7 @@ Skrip: `scripts/generate-solar-system-ar-model.mjs` (Three.js GLTFExporter).
 
 ## Konversi GLB → USDZ (iOS)
 
-Cursor/Node **tidak** menghasilkan USDZ secara native. Pilih salah satu:
+Node **tidak** menghasilkan USDZ secara native. Pilih salah satu:
 
 ### Opsi A — Reality Converter (paling mudah)
 
@@ -32,9 +50,6 @@ Cursor/Node **tidak** menghasilkan USDZ secara native. Pilih salah satu:
 3. Export / Save as `solar-system.usdz` ke folder ini.
 
 ### Opsi B — usdzconvert (CLI Apple)
-
-1. Unduh **USDZ Tools** dari [Apple AR Quick Look](https://developer.apple.com/augmented-reality/quick-look/).
-2. Konversi:
 
 ```bash
 usdzconvert public/models/solar-system.glb public/models/solar-system.usdz
@@ -46,7 +61,14 @@ usdzconvert public/models/solar-system.glb public/models/solar-system.usdz
 xcrun usdz_converter public/models/solar-system.glb public/models/solar-system.usdz
 ```
 
-> Catatan: `usdz_converter` sering tidak tersedia di Xcode terbaru; gunakan Opsi A atau B.
+> **Animasi di iOS:** Quick Look **mungkin** tidak memutar animasi GLB setelah konversi — model tetap tampil statis. Uji di iPhone; jika animasi tidak jalan, AR iOS tetap valid sebagai orrery statis.
+
+**Eksperimen pipeline animasi iOS:** lihat [README-solar-system-ios-animation.md](./README-solar-system-ios-animation.md)
+
+```bash
+bash scripts/ios-animated-usdz/try-pipelines.sh
+python3 scripts/ios-animated-usdz/inspect-usdz-animation.py public/models/solar-system.usdz
+```
 
 ## Verifikasi
 
@@ -55,7 +77,7 @@ curl -I http://localhost:3000/models/solar-system.glb
 curl -I http://localhost:3000/models/solar-system.usdz
 ```
 
-- **Android:** butuh `solar-system.glb`
+- **Android:** butuh `solar-system.glb` — animasi orbit via `autoplay` di model-viewer
 - **iPhone Safari:** butuh `solar-system.usdz` untuk AR Quick Look
 
-Jika USDZ belum ada, tombol AR di iPhone menampilkan pesan jelas — tidak ada file palsu atau fallback astronaut.
+Jika file belum ada, aplikasi menampilkan pesan jelas — tidak ada fallback ke model astronaut.

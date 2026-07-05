@@ -80,104 +80,105 @@ export const ModelViewer = forwardRef<ModelViewerHandle, ModelViewerProps>(
     },
     ref,
   ) {
-  const [ready, setReady] = useState(false);
-  const elRef = useRef<ModelViewerElement | null>(null);
+    const [ready, setReady] = useState(false);
+    const elRef = useRef<ModelViewerElement | null>(null);
 
-  useImperativeHandle(
-    ref,
-    () => ({
-      activateAR: () => {
-        elRef.current?.activateAR?.();
-      },
-    }),
-    [],
-  );
-
-  useEffect(() => {
-    let mounted = true;
-    import("@google/model-viewer")
-      .then(() => {
-        if (mounted) setReady(true);
-      })
-      .catch((err) => console.error("Gagal memuat model-viewer:", err));
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  useEffect(() => {
-    const el = elRef.current;
-    if (!el || !ready) return;
-    if (autoplay) {
-      el.setAttribute("autoplay", "");
-    } else {
-      el.removeAttribute("autoplay");
-    }
-  }, [ready, autoplay]);
-
-  const handleRef = useCallback(
-    (node: HTMLElement | null) => {
-      const el = node as ModelViewerElement | null;
-      if (elRef.current) {
-        elRef.current.removeEventListener("load", reportAr);
-        elRef.current.removeEventListener("ar-status", reportStatus);
-      }
-      elRef.current = el;
-      if (el) {
-        el.addEventListener("load", reportAr);
-        el.addEventListener("ar-status", reportStatus);
-      }
-      function reportAr() {
-        onArAvailability?.(Boolean(el?.canActivateAR));
-      }
-      function reportStatus(event: Event) {
-        const status = (event as CustomEvent<{ status: ArStatus }>).detail
-          ?.status;
-        if (status) onArStatus?.(status);
-      }
-    },
-    [onArAvailability, onArStatus],
-  );
-
-  if (!ready) {
-    return (
-      <div
-        className={cn(
-          "flex items-center justify-center rounded-xl bg-muted text-sm text-muted-foreground",
-          className,
-        )}
-      >
-        Memuat model 3D…
-      </div>
+    useImperativeHandle(
+      ref,
+      () => ({
+        activateAR: () => {
+          elRef.current?.activateAR?.();
+        },
+      }),
+      [],
     );
-  }
 
-  return (
-    <model-viewer
-      ref={handleRef}
-      src={src}
-      ios-src={iosSrc}
-      alt={alt}
-      ar={ar}
-      ar-modes="webxr scene-viewer quick-look"
-      ar-placement="floor"
-      camera-controls
-      touch-action="pan-y"
-      auto-rotate={autoRotate}
-      shadow-intensity="1"
-      poster={poster}
-      className={cn("h-full w-full", className)}
-      style={{ backgroundColor: "transparent" }}
-    >
-      {ar ? (
-        <button
-          slot="ar-button"
-          className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground shadow-lg transition-colors hover:bg-primary/90"
+    useEffect(() => {
+      let mounted = true;
+      import("@google/model-viewer")
+        .then(() => {
+          if (mounted) setReady(true);
+        })
+        .catch((err) => console.error("Gagal memuat model-viewer:", err));
+      return () => {
+        mounted = false;
+      };
+    }, []);
+
+    useEffect(() => {
+      const el = elRef.current;
+      if (!el || !ready) return;
+      if (autoplay) {
+        el.setAttribute("autoplay", "");
+      } else {
+        el.removeAttribute("autoplay");
+      }
+    }, [ready, autoplay]);
+
+    const handleRef = useCallback(
+      (node: HTMLElement | null) => {
+        const el = node as ModelViewerElement | null;
+        if (elRef.current) {
+          elRef.current.removeEventListener("load", reportAr);
+          elRef.current.removeEventListener("ar-status", reportStatus);
+        }
+        elRef.current = el;
+        if (el) {
+          el.addEventListener("load", reportAr);
+          el.addEventListener("ar-status", reportStatus);
+        }
+        function reportAr() {
+          onArAvailability?.(Boolean(el?.canActivateAR));
+        }
+        function reportStatus(event: Event) {
+          const status = (event as CustomEvent<{ status: ArStatus }>).detail
+            ?.status;
+          if (status) onArStatus?.(status);
+        }
+      },
+      [onArAvailability, onArStatus],
+    );
+
+    if (!ready) {
+      return (
+        <div
+          className={cn(
+            "flex items-center justify-center rounded-xl bg-muted text-sm text-muted-foreground",
+            className,
+          )}
         >
-          {arButtonLabel}
-        </button>
-      ) : null}
-    </model-viewer>
-  );
-},
+          Memuat model 3D…
+        </div>
+      );
+    }
+
+    return (
+      <model-viewer
+        ref={handleRef}
+        src={src}
+        ios-src={iosSrc}
+        alt={alt}
+        ar={ar}
+        ar-modes="webxr scene-viewer quick-look"
+        ar-placement="floor"
+        camera-controls
+        touch-action="pan-y"
+        auto-rotate={autoRotate}
+        {...(autoplay ? { autoplay: "" } : {})}
+        shadow-intensity="1"
+        poster={poster}
+        className={cn("h-full w-full", className)}
+        style={{ backgroundColor: "transparent" }}
+      >
+        {ar ? (
+          <button
+            slot="ar-button"
+            className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground shadow-lg transition-colors hover:bg-primary/90"
+          >
+            {arButtonLabel}
+          </button>
+        ) : null}
+      </model-viewer>
+    );
+  },
 );
