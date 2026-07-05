@@ -69,6 +69,30 @@ export function PraktikumView({
     );
   }
 
+  if (rangkaian) {
+    return (
+      <RangkaianPraktikum
+        modul={modul}
+        langkah={langkah}
+        arSupported={arTersedia}
+        onArAvailability={setArTersedia}
+        onArStatus={tanganiStatusAr}
+      />
+    );
+  }
+
+  if (newton) {
+    return (
+      <NewtonPraktikum
+        modul={modul}
+        langkah={langkah}
+        arSupported={arTersedia}
+        onArAvailability={setArTersedia}
+        onArStatus={tanganiStatusAr}
+      />
+    );
+  }
+
   return (
     <div className="flex h-dvh flex-col">
       {/* Bilah atas */}
@@ -98,28 +122,10 @@ export function PraktikumView({
         <section
           className={cn(
             "relative shrink-0 bg-gradient-to-b from-muted/60 to-muted",
-            newton &&
-              "h-[min(60svh,calc(100svh-3.5rem-34svh))] max-h-[62svh] min-h-0 max-lg:overflow-hidden lg:h-auto lg:max-h-none lg:min-h-0 lg:flex-1",
-            rangkaian &&
-              "max-lg:h-auto max-lg:overflow-visible lg:h-auto lg:min-h-0 lg:flex-1",
             !interaktif && "h-[45vh] lg:h-auto lg:flex-1",
           )}
         >
-          {newton ? (
-            <NewtonPraktikum
-              modul={modul}
-              arSupported={arTersedia}
-              onArAvailability={setArTersedia}
-              onArStatus={tanganiStatusAr}
-            />
-          ) : rangkaian ? (
-            <RangkaianPraktikum
-              modul={modul}
-              arSupported={arTersedia}
-              onArAvailability={setArTersedia}
-              onArStatus={tanganiStatusAr}
-            />
-          ) : belumSiap ? (
+          {belumSiap ? (
             <PraktikumPlaceholder
               judul={modul.judul}
               deskripsi={modul.deskripsi}
@@ -151,10 +157,6 @@ export function PraktikumView({
         <aside
           className={cn(
             "flex min-h-0 flex-col overflow-hidden border-t lg:max-w-md lg:border-l lg:border-t-0",
-            newton &&
-              "max-h-[min(36svh,calc(100svh-3.5rem-48svh))] flex-1 min-h-0 max-lg:shrink lg:max-h-none lg:min-h-0 lg:flex-1",
-            rangkaian &&
-              "max-lg:mt-1 max-lg:flex-1 max-lg:min-h-0 max-lg:shrink lg:max-h-none lg:min-h-0 lg:flex-1",
             !interaktif && "flex-1",
           )}
         >
@@ -184,8 +186,6 @@ export function PraktikumView({
               <PanduanLangkah
                 langkah={langkah}
                 arAktif={arAktif}
-                newton={newton}
-                rangkaian={rangkaian}
               />
             </TabsContent>
 

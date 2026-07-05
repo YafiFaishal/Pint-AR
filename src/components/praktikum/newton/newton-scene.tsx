@@ -200,42 +200,6 @@ function BalokDenganGaya({
   );
 }
 
-function HudNilai({
-  force,
-  mass,
-  acceleration,
-}: {
-  force: number;
-  mass: number;
-  acceleration: number;
-}) {
-  const items = [
-    { label: "F", value: `${force} N` },
-    { label: "m", value: `${mass} kg` },
-    { label: "a", value: `${acceleration.toFixed(2)} m/s²` },
-  ] as const;
-
-  return (
-    <div className="pointer-events-none absolute inset-x-0 top-2 z-10 flex justify-center px-2 lg:top-3">
-      <div className="grid w-full max-w-xs grid-cols-3 gap-1 lg:max-w-sm lg:gap-1.5">
-        {items.map(({ label, value }) => (
-          <div
-            key={label}
-            className="rounded-md border bg-background/90 px-1 py-0.5 text-center shadow-sm backdrop-blur-sm lg:px-2 lg:py-1"
-          >
-            <p className="text-[9px] font-medium text-muted-foreground lg:text-[10px]">
-              {label}
-            </p>
-            <p className="text-[10px] font-semibold tabular-nums lg:text-xs">
-              {value}
-            </p>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 export function NewtonScene({
   mass,
   force,
@@ -251,8 +215,6 @@ export function NewtonScene({
 }) {
   return (
     <div className="relative h-full w-full">
-      <HudNilai force={force} mass={mass} acceleration={acceleration} />
-
       <Canvas
         shadows
         camera={{ position: [1.65, 1.55, 3.15], fov: 38 }}

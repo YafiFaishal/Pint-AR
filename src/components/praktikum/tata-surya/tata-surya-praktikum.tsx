@@ -30,6 +30,7 @@ import {
   type TataSuryaArAssetStatus,
 } from "@/lib/tata-surya-assets";
 import { PracticumShell } from "@/components/praktikum/practicum-shell";
+import { PracticumQuickInfo } from "@/components/praktikum/practicum-quick-info";
 import { PanduanLangkah } from "@/components/praktikum/panduan-langkah";
 import { LksPanel } from "@/components/praktikum/lks-panel";
 import { TataSuryaScene } from "./tata-surya-scene";
@@ -41,38 +42,6 @@ type TataSuryaPraktikumProps = {
   onArAvailability: (supported: boolean) => void;
   onArStatus: (status: ArStatus) => void;
 };
-
-function TataSuryaQuickInfo({
-  planetLabel,
-  jarak,
-  periode,
-}: {
-  planetLabel: string;
-  jarak: number;
-  periode: number;
-}) {
-  const items = [
-    { label: "Planet", value: planetLabel },
-    { label: "r", value: jarak.toFixed(2) },
-    { label: "T", value: periode.toFixed(2) },
-  ] as const;
-
-  return (
-    <div className="grid grid-cols-3 gap-1.5 lg:gap-2">
-      {items.map(({ label, value }) => (
-        <div
-          key={label}
-          className="rounded-md border bg-background px-2 py-1.5 text-center shadow-sm lg:bg-background/90 lg:backdrop-blur-sm"
-        >
-          <p className="text-[9px] font-medium text-muted-foreground lg:text-[10px]">
-            {label}
-          </p>
-          <p className="truncate text-xs font-semibold tabular-nums">{value}</p>
-        </div>
-      ))}
-    </div>
-  );
-}
 
 export function TataSuryaPraktikum({
   modul,
@@ -276,10 +245,16 @@ export function TataSuryaPraktikum({
       badge={badge}
       scene={scene}
       quickInfo={
-        <TataSuryaQuickInfo
-          planetLabel={PLANET_INFO[planetTerpilih].label}
-          jarak={jarakAktif}
-          periode={periode}
+        <PracticumQuickInfo
+          items={[
+            {
+              key: "planet",
+              label: "Planet",
+              value: PLANET_INFO[planetTerpilih].label,
+            },
+            { key: "r", label: "r", value: jarakAktif.toFixed(2) },
+            { key: "t", label: "T", value: periode.toFixed(2) },
+          ]}
         />
       }
       mobileQuickInfoBelowScene

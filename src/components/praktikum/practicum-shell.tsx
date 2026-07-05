@@ -245,7 +245,7 @@ export function PracticumShell({
           />
 
           {mobileQuickInfoBelowScene && quickInfo ? (
-            <div className="shrink-0 border-t bg-background/95 px-3 py-2 backdrop-blur-sm lg:hidden">
+            <div className="h-fit shrink-0 border-t bg-background/95 px-3 py-2 backdrop-blur-sm lg:hidden">
               {quickInfo}
             </div>
           ) : null}
