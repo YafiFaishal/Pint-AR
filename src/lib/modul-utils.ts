@@ -17,12 +17,19 @@ export function isTataSuryaModul(modul: Pick<Modul, "judul">): boolean {
   return judul.includes("tata surya") || judul.includes("kepler");
 }
 
+/** Modul dengan praktikum 3D interaktif (simulasi gerak jatuh bebas). */
+export function isJatuhBebasModul(modul: Pick<Modul, "judul">): boolean {
+  const judul = modul.judul.toLowerCase();
+  return judul.includes("jatuh bebas") || judul.includes("gerak jatuh");
+}
+
 /** Modul praktikum interaktif (layout mobile khusus). */
 export function isPraktikumInteraktif(modul: Pick<Modul, "judul">): boolean {
   return (
     isNewtonModul(modul) ||
     isRangkaianModul(modul) ||
-    isTataSuryaModul(modul)
+    isTataSuryaModul(modul) ||
+    isJatuhBebasModul(modul)
   );
 }
 

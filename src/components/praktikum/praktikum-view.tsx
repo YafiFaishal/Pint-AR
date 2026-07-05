@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { ArrowLeft, Rotate3d } from "lucide-react";
 import type { Modul, LangkahPraktikum } from "@/db/schema";
 import { ModelViewer, type ArStatus } from "@/components/model-viewer";
+import { JatuhBebasPraktikum } from "@/components/praktikum/jatuh-bebas/jatuh-bebas-praktikum";
 import { NewtonPraktikum } from "@/components/praktikum/newton/newton-praktikum";
 import { RangkaianPraktikum } from "@/components/praktikum/rangkaian/rangkaian-praktikum";
 import { TataSuryaPraktikum } from "@/components/praktikum/tata-surya/tata-surya-praktikum";
@@ -17,6 +18,7 @@ import {
   PanduanLangkah,
 } from "@/components/praktikum/panduan-langkah";
 import {
+  isJatuhBebasModul,
   isModulBelumSiap,
   isNewtonModul,
   isPraktikumInteraktif,
@@ -41,6 +43,7 @@ export function PraktikumView({
   const newton = isNewtonModul(modul);
   const rangkaian = isRangkaianModul(modul);
   const tataSurya = isTataSuryaModul(modul);
+  const jatuhBebas = isJatuhBebasModul(modul);
   const interaktif = isPraktikumInteraktif(modul);
   const belumSiap = isModulBelumSiap(modul);
 
@@ -84,6 +87,18 @@ export function PraktikumView({
   if (newton) {
     return (
       <NewtonPraktikum
+        modul={modul}
+        langkah={langkah}
+        arSupported={arTersedia}
+        onArAvailability={setArTersedia}
+        onArStatus={tanganiStatusAr}
+      />
+    );
+  }
+
+  if (jatuhBebas) {
+    return (
+      <JatuhBebasPraktikum
         modul={modul}
         langkah={langkah}
         arSupported={arTersedia}

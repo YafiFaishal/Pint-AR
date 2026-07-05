@@ -40,19 +40,34 @@ export type PracticumShellProps = {
    * (bukan di dalam tab Kontrol).
    */
   mobileQuickInfoBelowScene?: boolean;
+  /**
+   * Padding bawah tab mobile — `large` untuk modul dengan kontrol panjang + AR.
+   * Default tidak mengubah modul lain.
+   */
+  mobileSheetPadding?: "default" | "large";
+  /** Kelas tambahan pada strip quick info mobile (opsional). */
+  mobileQuickInfoClassName?: string;
 };
 
 const DESKTOP_TAB_PANEL_CLASS =
   "min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 pb-3 pt-1 lg:px-4 lg:pb-4 lg:pt-2";
 
 /** Panel tab mobile — scrollable, aman untuk Safari bottom bar */
-const MOBILE_TAB_PANEL_CLASS = cn(
+const MOBILE_TAB_PANEL_PB = {
+  default: "pb-[calc(10rem+env(safe-area-inset-bottom,0px))]",
+  large: "pb-[calc(11.5rem+env(safe-area-inset-bottom,0px))]",
+} as const;
+
+const MOBILE_TAB_PANEL_BASE = cn(
   "min-h-0 max-h-full flex-1 overflow-y-auto overscroll-y-contain",
   "touch-pan-y px-3 pt-1",
-  "pb-[calc(10rem+env(safe-area-inset-bottom,0px))]",
   "[-webkit-overflow-scrolling:touch]",
   "[hidden]:hidden data-[hidden]:hidden",
 );
+
+function mobileTabPanelClass(padding: "default" | "large" = "default") {
+  return cn(MOBILE_TAB_PANEL_BASE, MOBILE_TAB_PANEL_PB[padding]);
+}
 
 function SceneArea({
   scene,
@@ -93,9 +108,10 @@ function MobileBottomSheet({
   quickInfo,
   arButton,
   quickInfoInSheet,
+  mobileSheetPadding = "default",
 }: Pick<
   PracticumShellProps,
-  "controls" | "guide" | "lks" | "quickInfo" | "arButton"
+  "controls" | "guide" | "lks" | "quickInfo" | "arButton" | "mobileSheetPadding"
 > & { quickInfoInSheet: boolean }) {
   return (
     <div
@@ -128,23 +144,23 @@ function MobileBottomSheet({
           </TabsList>
         </div>
 
-        <TabsContent value="kontrol" className={MOBILE_TAB_PANEL_CLASS}>
+        <TabsContent value="kontrol" className={mobileTabPanelClass(mobileSheetPadding)}>
           <div className="space-y-2">
             {quickInfoInSheet && quickInfo ? (
               <div className="pointer-events-auto">{quickInfo}</div>
             ) : null}
             <div className="pointer-events-auto">{controls}</div>
             {arButton ? (
-              <div className="pointer-events-auto pt-1">{arButton}</div>
+              <div className="pointer-events-auto pt-0.5">{arButton}</div>
             ) : null}
           </div>
         </TabsContent>
 
-        <TabsContent value="panduan" className={MOBILE_TAB_PANEL_CLASS}>
+        <TabsContent value="panduan" className={mobileTabPanelClass(mobileSheetPadding)}>
           <div className="pointer-events-auto min-h-0">{guide}</div>
         </TabsContent>
 
-        <TabsContent value="lks" className={MOBILE_TAB_PANEL_CLASS}>
+        <TabsContent value="lks" className={mobileTabPanelClass(mobileSheetPadding)}>
           <div className="pointer-events-auto min-h-0">{lks}</div>
         </TabsContent>
       </Tabs>
@@ -204,6 +220,8 @@ export function PracticumShell({
   sceneClassName,
   layoutVariant = "interactive",
   mobileQuickInfoBelowScene = false,
+  mobileSheetPadding = "default",
+  mobileQuickInfoClassName,
 }: PracticumShellProps) {
   const interactive = layoutVariant === "interactive";
 
@@ -245,7 +263,12 @@ export function PracticumShell({
           />
 
           {mobileQuickInfoBelowScene && quickInfo ? (
-            <div className="h-fit shrink-0 border-t bg-background/95 px-3 py-2 backdrop-blur-sm lg:hidden">
+            <div
+              className={cn(
+                "h-fit shrink-0 border-t bg-background/95 px-3 py-2 backdrop-blur-sm lg:hidden",
+                mobileQuickInfoClassName,
+              )}
+            >
               {quickInfo}
             </div>
           ) : null}
@@ -265,6 +288,7 @@ export function PracticumShell({
             quickInfo={quickInfo}
             arButton={arButton}
             quickInfoInSheet={!mobileQuickInfoBelowScene}
+            mobileSheetPadding={mobileSheetPadding}
           />
         </section>
 

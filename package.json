@@ -14,9 +14,11 @@
     "db:seed": "tsx src/db/seed.ts",
     "db:seed-modules": "tsx src/db/seed-modules.ts",
     "db:seed-tata-surya": "tsx src/db/seed-tata-surya.ts",
+    "db:seed-jatuh-bebas": "tsx src/db/seed-jatuh-bebas.ts",
     "generate:newton-ar": "node scripts/generate-newton-ar-model.mjs",
     "generate:circuit-ar": "node scripts/generate-circuit-ar-model.mjs",
-    "generate:solar-ar": "node scripts/generate-solar-system-ar-model.mjs"
+    "generate:solar-ar": "node scripts/generate-solar-system-ar-model.mjs",
+    "generate:free-fall-ar": "node scripts/generate-free-fall-ar-model.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",

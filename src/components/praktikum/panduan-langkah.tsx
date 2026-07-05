@@ -37,6 +37,12 @@ export const INSTRUKSI_TATA_SURYA_3D = {
     "Amati planet mengorbit Matahari, ubah jarak orbit planet terpilih, lalu bandingkan periode revolusi (T = √r³).",
 } as const;
 
+export const INSTRUKSI_JATUH_BEBAS_3D = {
+  judul: "Simulasi Gerak Jatuh Bebas",
+  deskripsi:
+    "Atur ketinggian dan gravitasi, pilih mode udara atau hampa, lalu tekan Jatuhkan dan amati waktu jatuh (t) serta kecepatan akhir (v).",
+} as const;
+
 export const INSTRUKSI_AR = {
   judul: "Arahkan Kamera ke Meja",
   deskripsi:
@@ -54,6 +60,7 @@ export type PanduanLangkahProps = {
   newton?: boolean;
   rangkaian?: boolean;
   tataSurya?: boolean;
+  jatuhBebas?: boolean;
 };
 
 export function PanduanLangkah({
@@ -62,6 +69,7 @@ export function PanduanLangkah({
   newton = false,
   rangkaian = false,
   tataSurya = false,
+  jatuhBebas = false,
 }: PanduanLangkahProps) {
   const total = langkah.length;
   const [idx, setIdx] = useState(0);
@@ -80,10 +88,11 @@ export function PanduanLangkah({
       if (newton) return INSTRUKSI_NEWTON_3D;
       if (rangkaian) return INSTRUKSI_RANGKAIAN_3D;
       if (tataSurya) return INSTRUKSI_TATA_SURYA_3D;
+      if (jatuhBebas) return INSTRUKSI_JATUH_BEBAS_3D;
       return INSTRUKSI_3D;
     }
     return { judul: langkahAktif.judul, deskripsi: langkahAktif.instruksi };
-  }, [langkahAktif, arAktif, newton, rangkaian, tataSurya]);
+  }, [langkahAktif, arAktif, newton, rangkaian, tataSurya, jatuhBebas]);
 
   if (total === 0) {
     return (
