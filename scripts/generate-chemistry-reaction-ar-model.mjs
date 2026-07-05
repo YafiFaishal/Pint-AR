@@ -9,6 +9,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import * as THREE from "three";
 import { GLTFExporter } from "three/examples/jsm/exporters/GLTFExporter.js";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 
 if (typeof globalThis.FileReader === "undefined") {
   globalThis.FileReader = class FileReader {
@@ -33,6 +34,8 @@ const SEG = 16;
 const WARNA_KIRI = 0xef4444;
 const WARNA_KANAN = 0x8b5cf6;
 const TINGGI_ISI = 0.32;
+const DURASI = 4.5;
+const JUMLAH_FRAME = 30;
 
 function mat(opts) {
   return new THREE.MeshStandardMaterial(opts);
@@ -89,17 +92,20 @@ function buatSelubungKaca({ radiusAtas, radiusBawah, tinggi, y, tutupBawah = fal
   return grup;
 }
 
-function buatCairan({ radiusAtas, radiusBawah, tinggi, warna, y }) {
+function buatCairan({ radiusAtas, radiusBawah, tinggi, warna, y, name }) {
   if (tinggi < 0.012) return new THREE.Group();
 
   const grup = new THREE.Group();
+  grup.name = name;
+  grup.position.y = y;
+
   const matCairan = mat({ color: warna, roughness: 0.32, metalness: 0.04 });
 
   const silinder = new THREE.Mesh(
     new THREE.CylinderGeometry(radiusAtas, radiusBawah, tinggi, SEG),
     matCairan,
   );
-  silinder.position.y = y + tinggi / 2;
+  silinder.position.y = tinggi / 2;
   grup.add(silinder);
 
   const permukaan = new THREE.Mesh(
@@ -107,7 +113,7 @@ function buatCairan({ radiusAtas, radiusBawah, tinggi, warna, y }) {
     mat({ color: warna, roughness: 0.22, metalness: 0.02 }),
   );
   permukaan.rotation.x = -Math.PI / 2;
-  permukaan.position.y = y + tinggi + 0.001;
+  permukaan.position.y = tinggi + 0.001;
   grup.add(permukaan);
 
   return grup;
@@ -179,6 +185,7 @@ function buatTabungReaksi({ posisi, warnaCairan, tinggiIsi }) {
       tinggi: isi * tinggi * 0.88,
       warna: warnaCairan,
       y: yDasar + 0.018,
+      name: posisi[0] < 0 ? "CairanKiri" : "CairanKanan",
     }),
   );
 
@@ -190,6 +197,9 @@ function buatGelasHasil() {
   const radiusAtas = 0.145;
   const radiusBawah = 0.108;
   const yDasar = 0.024;
+  const radiusCairanAtas = radiusAtas * 0.82;
+  const radiusCairanBawah = radiusBawah * 0.88;
+  const tinggiCairan = 0.38 * tinggi * 0.82;
 
   const grup = new THREE.Group();
   grup.name = "BeakerTengah";
@@ -211,7 +221,85 @@ function buatGelasHasil() {
     }),
   );
 
+  const cairanHasil = buatCairan({
+    radiusAtas: radiusCairanAtas,
+    radiusBawah: radiusCairanBawah,
+    tinggi: tinggiCairan,
+    warna: 0x22c55e,
+    y: yDasar + 0.012,
+    name: "CairanHasil",
+  });
+  cairanHasil.scale.y = 0.06;
+  grup.add(cairanHasil);
+
+  for (let i = 0; i < 3; i++) {
+    const gelembung = new THREE.Mesh(
+      new THREE.SphereGeometry(0.009, 6, 6),
+      mat({
+        color: 0xe0f2fe,
+        transparent: true,
+        opacity: 0.55,
+        roughness: 0.2,
+      }),
+    );
+    gelembung.name = `Gelembung${i + 1}`;
+    gelembung.position.set(
+      Math.sin(i * 2.1) * 0.03,
+      yDasar + 0.08 + i * 0.04,
+      Math.cos(i * 1.7) * 0.025,
+    );
+    grup.add(gelembung);
+  }
+
   return grup;
+}
+
+function buatAnimasi() {
+  const times = [0, DURASI * 0.55, DURASI];
+  const scaleUniform = (a, b, c) => [a, a, a, b, b, b, c, c, c];
+
+  const tracks = [
+    new THREE.VectorKeyframeTrack(
+      "CairanKiri.scale",
+      times,
+      scaleUniform(1, 0.38, 1),
+    ),
+    new THREE.VectorKeyframeTrack(
+      "CairanKanan.scale",
+      times,
+      scaleUniform(1, 0.38, 1),
+    ),
+    new THREE.VectorKeyframeTrack(
+      "CairanHasil.scale",
+      times,
+      scaleUniform(0.06, 0.82, 0.06),
+    ),
+  ];
+
+  for (let i = 0; i < 3; i++) {
+    const yBase = 0.08 + i * 0.035;
+    const bubbleTimes = [];
+    const bubbleValues = [];
+    for (let f = 0; f <= JUMLAH_FRAME; f++) {
+      const t = (f / JUMLAH_FRAME) * DURASI;
+      bubbleTimes.push(t);
+      const phase = (t / DURASI + i * 0.22) % 1;
+      bubbleValues.push(
+        Math.sin(i * 2.1) * 0.03,
+        yBase + phase * 0.14,
+        Math.cos(i * 1.7) * 0.025,
+      );
+    }
+    tracks.push(
+      new THREE.VectorKeyframeTrack(
+        `Gelembung${i + 1}.position`,
+        bubbleTimes,
+        bubbleValues,
+      ),
+    );
+  }
+
+  return [new THREE.AnimationClip("ReaksiCampurDemo", DURASI, tracks)];
 }
 
 function buatTray() {
@@ -268,10 +356,13 @@ function buatScene() {
   );
   root.add(buatGelasHasil());
 
+  root.updateMatrixWorld(true);
+  root.animations = buatAnimasi();
+
   return root;
 }
 
-async function eksporGlb(scene) {
+async function eksporGlb(scene, animations) {
   const exporter = new GLTFExporter();
   return new Promise((resolve, reject) => {
     exporter.parse(
@@ -281,9 +372,23 @@ async function eksporGlb(scene) {
         else reject(new Error("Bukan GLB"));
       },
       reject,
-      { binary: true },
+      { binary: true, animations },
     );
   });
+}
+
+async function verifikasi(buffer) {
+  const loader = new GLTFLoader();
+  const gltf = await loader.parseAsync(buffer, "");
+  const jumlah = gltf.animations?.length ?? 0;
+  if (jumlah === 0) {
+    console.warn("⚠ Animasi tidak ter-export — AR akan memakai model statis.");
+    return false;
+  }
+  console.log(
+    `✓ ${jumlah} animation clip: ${gltf.animations.map((a) => a.name).join(", ")}`,
+  );
+  return true;
 }
 
 async function main() {
@@ -292,12 +397,13 @@ async function main() {
   scene.name = "ChemistryReactionScene";
   scene.add(root);
 
-  const buffer = await eksporGlb(scene);
+  const buffer = await eksporGlb(scene, root.animations);
   mkdirSync(dirname(OUT_FILE), { recursive: true });
   writeFileSync(OUT_FILE, Buffer.from(buffer));
   console.log(
     `✓ chemistry-reaction.glb (${(buffer.byteLength / 1024).toFixed(1)} KB)`,
   );
+  await verifikasi(buffer);
   console.log(
     "ℹ Konversi manual: chemistry-reaction.glb → chemistry-reaction.usdz untuk AR iOS.",
   );

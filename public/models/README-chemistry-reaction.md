@@ -11,6 +11,8 @@ File untuk mode **Lihat AR** pada modul Reaksi Kimia. Simulasi 3D interaktif (sl
 
 Isi model: **sama geometri & warna** dengan simulasi 3D (`reaksi-kimia-scene.tsx`) — tray abu-biru gelap, tabung kiri larutan merah, tabung kanan larutan ungu, beaker tengah kosong.
 
+Animasi GLB (`ReaksiCampurDemo`, loop ~4.5 detik): cairan tabung turun → cairan hijau naik di beaker + gelembung ringan. **Android/WebXR** via `autoplay`; **iOS USDZ** tetap statis.
+
 ## Regenerasi GLB
 
 ```bash
