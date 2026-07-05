@@ -1,10 +1,22 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
 import { cn } from "@/lib/utils";
 
 type ModelViewerElement = HTMLElement & {
   canActivateAR?: boolean;
+  activateAR?: () => void;
+};
+
+export type ModelViewerHandle = {
+  activateAR: () => void;
 };
 
 /** Status sesi AR dari model-viewer. */
@@ -49,20 +61,34 @@ export interface ModelViewerProps {
  *
  * Ganti `src` / `iosSrc` dengan URL aset GLB/USDZ milik Anda kapan saja.
  */
-export function ModelViewer({
-  src,
-  iosSrc,
-  alt = "Model 3D alat lab",
-  ar = true,
-  autoRotate = true,
-  poster,
-  arButtonLabel = "Lihat di Meja (AR)",
-  onArAvailability,
-  onArStatus,
-  className,
-}: ModelViewerProps) {
+export const ModelViewer = forwardRef<ModelViewerHandle, ModelViewerProps>(
+  function ModelViewer(
+    {
+      src,
+      iosSrc,
+      alt = "Model 3D alat lab",
+      ar = true,
+      autoRotate = true,
+      poster,
+      arButtonLabel = "Lihat di Meja (AR)",
+      onArAvailability,
+      onArStatus,
+      className,
+    },
+    ref,
+  ) {
   const [ready, setReady] = useState(false);
   const elRef = useRef<ModelViewerElement | null>(null);
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      activateAR: () => {
+        elRef.current?.activateAR?.();
+      },
+    }),
+    [],
+  );
 
   useEffect(() => {
     let mounted = true;
@@ -140,4 +166,5 @@ export function ModelViewer({
       ) : null}
     </model-viewer>
   );
-}
+},
+);
