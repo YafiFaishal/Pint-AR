@@ -1,64 +1,32 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
-import {
-  ArrowLeft,
-  ChevronLeft,
-  ChevronRight,
-  CheckCircle2,
-  Rotate3d,
-} from "lucide-react";
+import { ArrowLeft, Rotate3d } from "lucide-react";
 import type { Modul, LangkahPraktikum } from "@/db/schema";
 import { ModelViewer, type ArStatus } from "@/components/model-viewer";
 import { NewtonPraktikum } from "@/components/praktikum/newton/newton-praktikum";
 import { RangkaianPraktikum } from "@/components/praktikum/rangkaian/rangkaian-praktikum";
+import { TataSuryaPraktikum } from "@/components/praktikum/tata-surya/tata-surya-praktikum";
+import { PraktikumPlaceholder } from "@/components/praktikum/praktikum-placeholder";
 import { LksPanel } from "@/components/praktikum/lks-panel";
 import {
+  INSTRUKSI_3D,
+  INSTRUKSI_AR,
+  PanduanLangkah,
+} from "@/components/praktikum/panduan-langkah";
+import {
+  isModulBelumSiap,
   isNewtonModul,
   isPraktikumInteraktif,
   isRangkaianModul,
+  isTataSuryaModul,
 } from "@/lib/modul-utils";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
-/** Instruksi global saat pengguna berada di viewer 3D (belum masuk AR). */
-const INSTRUKSI_3D = {
-  judul: "Amati Model 3D",
-  deskripsi:
-    "Putar model dengan satu jari, cubit untuk memperbesar, lalu ikuti langkah praktikum dan isi LKS.",
-} as const;
-
-/** Instruksi praktikum interaktif Hukum Newton (mode 3D, bukan AR). */
-const INSTRUKSI_NEWTON_3D = {
-  judul: "Simulasi Gaya & Gerak",
-  deskripsi:
-    "Atur massa dan gaya dengan slider, baca percepatan (a = F/m), lalu tekan Dorong untuk menggerakkan balok di lintasan.",
-} as const;
-
-/** Instruksi praktikum interaktif Rangkaian Listrik (mode 3D, bukan AR). */
-const INSTRUKSI_RANGKAIAN_3D = {
-  judul: "Simulasi Rangkaian Listrik",
-  deskripsi:
-    "Nyalakan saklar, atur tegangan dan hambatan, lalu amati arus (I = V/R) serta lampu yang menyala saat rangkaian tertutup.",
-} as const;
-
-/** Instruksi global saat sesi AR aktif (setelah tombol "Lihat di Meja"). */
-const INSTRUKSI_AR = {
-  judul: "Arahkan Kamera ke Meja",
-  deskripsi:
-    "Gerakkan HP perlahan ke permukaan meja yang datar dan cukup terang sampai alat 3D muncul.",
-} as const;
-
-/** Langkah yang meminta penempatan AR — teksnya diganti sesuai mode tampilan. */
-function isLangkahPenempatanAr(l: LangkahPraktikum): boolean {
-  const teks = `${l.judul ?? ""} ${l.instruksi}`.toLowerCase();
-  return /kamera|meja|arahkan/.test(teks);
-}
 
 export function PraktikumView({
   modul,
@@ -72,7 +40,9 @@ export function PraktikumView({
   const arGagalRef = useRef(false);
   const newton = isNewtonModul(modul);
   const rangkaian = isRangkaianModul(modul);
+  const tataSurya = isTataSuryaModul(modul);
   const interaktif = isPraktikumInteraktif(modul);
+  const belumSiap = isModulBelumSiap(modul);
 
   function tanganiStatusAr(status: ArStatus) {
     if (status === "session-started" || status === "object-placed") {
@@ -85,6 +55,18 @@ export function PraktikumView({
       arGagalRef.current = true;
       toast.info("Mode AR tidak dapat dibuka. Menampilkan tampilan 3D 360°.");
     }
+  }
+
+  if (tataSurya) {
+    return (
+      <TataSuryaPraktikum
+        modul={modul}
+        langkah={langkah}
+        arSupported={arTersedia}
+        onArAvailability={setArTersedia}
+        onArStatus={tanganiStatusAr}
+      />
+    );
   }
 
   return (
@@ -107,6 +89,7 @@ export function PraktikumView({
           arTersedia={arTersedia}
           arAktif={arAktif}
           interaktif={interaktif && !arAktif}
+          belumSiap={belumSiap}
         />
       </header>
 
@@ -135,6 +118,11 @@ export function PraktikumView({
               arSupported={arTersedia}
               onArAvailability={setArTersedia}
               onArStatus={tanganiStatusAr}
+            />
+          ) : belumSiap ? (
+            <PraktikumPlaceholder
+              judul={modul.judul}
+              deskripsi={modul.deskripsi}
             />
           ) : modul.modelGlbUrl ? (
             <ModelViewer
@@ -217,121 +205,6 @@ export function PraktikumView({
   );
 }
 
-function PanduanLangkah({
-  langkah,
-  arAktif,
-  newton,
-  rangkaian,
-}: {
-  langkah: LangkahPraktikum[];
-  arAktif: boolean;
-  newton: boolean;
-  rangkaian: boolean;
-}) {
-  const total = langkah.length;
-  const [idx, setIdx] = useState(0);
-  const [selesai, setSelesai] = useState(false);
-
-  const langkahAktif = langkah[idx];
-  const persen = useMemo(
-    () => (total > 0 ? Math.round(((idx + 1) / total) * 100) : 0),
-    [idx, total],
-  );
-
-  // Untuk langkah penempatan AR, tampilkan instruksi sesuai mode tampilan saat ini.
-  const tampil = useMemo(() => {
-    if (!langkahAktif) return null;
-    if (isLangkahPenempatanAr(langkahAktif)) {
-      if (arAktif) return INSTRUKSI_AR;
-      if (newton) return INSTRUKSI_NEWTON_3D;
-      if (rangkaian) return INSTRUKSI_RANGKAIAN_3D;
-      return INSTRUKSI_3D;
-    }
-    return { judul: langkahAktif.judul, deskripsi: langkahAktif.instruksi };
-  }, [langkahAktif, arAktif, newton, rangkaian]);
-
-  if (total === 0) {
-    return (
-      <p className="text-sm text-muted-foreground">
-        Belum ada panduan langkah untuk modul ini.
-      </p>
-    );
-  }
-
-  if (selesai) {
-    return (
-      <div className="flex h-full flex-col items-center justify-center gap-4 text-center">
-        <CheckCircle2 className="size-14 text-primary" />
-        <div>
-          <h2 className="text-xl font-semibold">Praktikum Selesai!</h2>
-          <p className="text-muted-foreground">
-            Kamu telah menyelesaikan seluruh langkah. Jangan lupa isi LKS-mu ya.
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            onClick={() => {
-              setSelesai(false);
-              setIdx(0);
-            }}
-          >
-            Ulangi
-          </Button>
-          <Button render={<Link href="/siswa" />} nativeButton={false}>
-            Kembali ke Beranda
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="flex h-full flex-col">
-      <div className="mb-4">
-        <div className="mb-1 flex items-center justify-between text-sm">
-          <span className="font-medium text-muted-foreground">
-            Langkah {idx + 1} dari {total}
-          </span>
-          <span className="text-muted-foreground">{persen}%</span>
-        </div>
-        <Progress value={persen} />
-      </div>
-
-      <div className="flex-1">
-        {tampil?.judul ? (
-          <h2 className="mb-2 text-lg font-semibold">{tampil.judul}</h2>
-        ) : null}
-        <p className="leading-relaxed text-foreground/90">{tampil?.deskripsi}</p>
-      </div>
-
-      <div className="mt-6 flex items-center justify-between gap-2">
-        <Button
-          variant="outline"
-          onClick={() => setIdx((i) => Math.max(0, i - 1))}
-          disabled={idx === 0}
-        >
-          <ChevronLeft /> Sebelumnya
-        </Button>
-        {idx < total - 1 ? (
-          <Button onClick={() => setIdx((i) => Math.min(total - 1, i + 1))}>
-            Selanjutnya <ChevronRight />
-          </Button>
-        ) : (
-          <Button
-            onClick={() => {
-              setSelesai(true);
-              toast.success("Praktikum selesai! Kerja bagus. 🎉");
-            }}
-          >
-            <CheckCircle2 /> Selesaikan
-          </Button>
-        )}
-      </div>
-    </div>
-  );
-}
-
 function ModeInstruksiOverlay({
   arAktif,
   arTersedia,
@@ -367,11 +240,20 @@ function ModeBadge({
   arTersedia,
   arAktif,
   interaktif,
+  belumSiap,
 }: {
   arTersedia: boolean | null;
   arAktif: boolean;
   interaktif?: boolean;
+  belumSiap?: boolean;
 }) {
+  if (belumSiap) {
+    return (
+      <Badge variant="outline" className="shrink-0">
+        Segera Hadir
+      </Badge>
+    );
+  }
   if (arAktif) {
     return <Badge className="shrink-0">Mode AR aktif</Badge>;
   }

@@ -11,7 +11,22 @@ export function isRangkaianModul(modul: Pick<Modul, "judul">): boolean {
   return judul.includes("rangkaian") && judul.includes("listrik");
 }
 
+/** Modul dengan praktikum 3D interaktif (simulasi Tata Surya / Kepler). */
+export function isTataSuryaModul(modul: Pick<Modul, "judul">): boolean {
+  const judul = modul.judul.toLowerCase();
+  return judul.includes("tata surya") || judul.includes("kepler");
+}
+
 /** Modul praktikum interaktif (layout mobile khusus). */
 export function isPraktikumInteraktif(modul: Pick<Modul, "judul">): boolean {
-  return isNewtonModul(modul) || isRangkaianModul(modul);
+  return (
+    isNewtonModul(modul) ||
+    isRangkaianModul(modul) ||
+    isTataSuryaModul(modul)
+  );
+}
+
+/** Modul yang simulasinya belum tersedia — tampilkan placeholder. */
+export function isModulBelumSiap(modul: Pick<Modul, "judul">): boolean {
+  return !isPraktikumInteraktif(modul);
 }

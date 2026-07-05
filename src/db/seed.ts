@@ -13,6 +13,9 @@ async function seed() {
 
   const modulNewtonId = randomUUID();
   const modulRangkaId = randomUUID();
+  const modulTataSuryaId = randomUUID();
+  const modulJatuhBebasId = randomUUID();
+  const modulReaksiKimiaId = randomUUID();
 
   await db.insert(modul).values([
     {
@@ -35,6 +38,30 @@ async function seed() {
         "https://modelviewer.dev/shared-assets/models/NeilArmstrong.usdz",
       deskripsi:
         "Rangkai baterai, kabel, dan lampu untuk memahami arus listrik pada rangkaian tertutup.",
+    },
+    {
+      id: modulTataSuryaId,
+      judul: "Tata Surya (Kepler)",
+      modelGlbUrl: null,
+      modelUsdzUrl: null,
+      deskripsi:
+        "Eksplorasi orbit planet-planet dengan simulasi fisika Hukum Kepler interaktif.",
+    },
+    {
+      id: modulJatuhBebasId,
+      judul: "Gerak Jatuh Bebas",
+      modelGlbUrl: null,
+      modelUsdzUrl: null,
+      deskripsi:
+        "Buktikan percepatan gravitasi bumi dan bandingkan jatuh di ruang udara vs hampa.",
+    },
+    {
+      id: modulReaksiKimiaId,
+      judul: "Reaksi Kimia",
+      modelGlbUrl: null,
+      modelUsdzUrl: null,
+      deskripsi:
+        "Campurkan bahan kimia untuk mengamati perubahan suhu, pH, dan warna.",
     },
   ]);
 
@@ -94,6 +121,54 @@ async function seed() {
       instruksi:
         "Isi LKS berdasarkan pengamatanmu. Jelaskan mengapa lampu hanya menyala saat rangkaian tertutup.",
     },
+    {
+      id: randomUUID(),
+      modulId: modulTataSuryaId,
+      urutan: 1,
+      judul: "Amati Orbit Planet",
+      instruksi:
+        "Amati planet-planet yang mengorbit Matahari. Perhatikan bentuk lintasan dan arah gerak setiap planet.",
+    },
+    {
+      id: randomUUID(),
+      modulId: modulTataSuryaId,
+      urutan: 2,
+      judul: "Ubah Jarak Orbit",
+      instruksi:
+        "Pilih satu planet, lalu geser slider jarak orbit (r). Perhatikan bagaimana lintasannya melebar atau menyempit.",
+    },
+    {
+      id: randomUUID(),
+      modulId: modulTataSuryaId,
+      urutan: 3,
+      judul: "Amati Perubahan Periode",
+      instruksi:
+        "Baca nilai periode orbit relatif (T). Bandingkan: semakin jauh jarak orbit, semakin besar periode revolusi (T = √r³).",
+    },
+    {
+      id: randomUUID(),
+      modulId: modulTataSuryaId,
+      urutan: 4,
+      judul: "Catat Kesimpulan",
+      instruksi:
+        "Isi LKS berdasarkan pengamatanmu tentang hubungan jarak orbit dan periode revolusi planet.",
+    },
+    {
+      id: randomUUID(),
+      modulId: modulJatuhBebasId,
+      urutan: 1,
+      judul: "Praktikum Sedang Disiapkan",
+      instruksi:
+        "Simulasi gerak jatuh bebas di udara dan ruang hampa sedang dikembangkan. Pantau pembaruan berikutnya.",
+    },
+    {
+      id: randomUUID(),
+      modulId: modulReaksiKimiaId,
+      urutan: 1,
+      judul: "Praktikum Sedang Disiapkan",
+      instruksi:
+        "Simulasi pencampuran bahan kimia sedang dikembangkan. Pantau pembaruan berikutnya.",
+    },
   ]);
 
   await db.insert(lksTemplate).values([
@@ -135,6 +210,32 @@ async function seed() {
       urutan: 4,
       pertanyaan:
         "Menurutmu, apa fungsi baterai dalam rangkaian listrik sederhana?",
+    },
+    {
+      id: randomUUID(),
+      modulId: modulTataSuryaId,
+      urutan: 1,
+      pertanyaan:
+        "Apa yang terjadi pada periode orbit ketika jarak planet dari Matahari diperbesar?",
+    },
+    {
+      id: randomUUID(),
+      modulId: modulTataSuryaId,
+      urutan: 2,
+      pertanyaan: "Planet yang lebih jauh bergerak lebih cepat atau lebih lambat?",
+    },
+    {
+      id: randomUUID(),
+      modulId: modulTataSuryaId,
+      urutan: 3,
+      pertanyaan:
+        "Jelaskan hubungan jarak orbit dan periode revolusi berdasarkan pengamatanmu.",
+    },
+    {
+      id: randomUUID(),
+      modulId: modulTataSuryaId,
+      urutan: 4,
+      pertanyaan: "Apa kesimpulanmu tentang Hukum Kepler?",
     },
   ]);
 

@@ -3,7 +3,9 @@ import { redirect } from "next/navigation";
 import { asc } from "drizzle-orm";
 import { db, modul } from "@/db";
 import { requireUser } from "@/lib/session";
+import { isPraktikumInteraktif } from "@/lib/modul-utils";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardContent,
@@ -36,10 +38,19 @@ export default async function SiswaBerandaPage() {
         </p>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {daftarModul.map((m) => (
+          {daftarModul.map((m) => {
+            const siap = isPraktikumInteraktif(m);
+            return (
             <Card key={m.id} className="flex flex-col">
               <CardHeader>
-                <CardTitle className="text-lg">{m.judul}</CardTitle>
+                <div className="flex items-start justify-between gap-2">
+                  <CardTitle className="text-lg">{m.judul}</CardTitle>
+                  {!siap ? (
+                    <Badge variant="outline" className="shrink-0 text-[10px]">
+                      Segera
+                    </Badge>
+                  ) : null}
+                </div>
                 {m.deskripsi ? (
                   <CardDescription>{m.deskripsi}</CardDescription>
                 ) : null}
@@ -49,12 +60,14 @@ export default async function SiswaBerandaPage() {
                   render={<Link href={`/praktikum/${m.id}`} />}
                   nativeButton={false}
                   className="w-full"
+                  variant={siap ? "default" : "outline"}
                 >
                   Mulai Praktikum
                 </Button>
               </CardContent>
             </Card>
-          ))}
+            );
+          })}
         </div>
       )}
     </main>
