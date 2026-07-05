@@ -189,7 +189,7 @@ export function RangkaianPraktikum({
         <p
           className={cn(
             "text-[10px] lg:text-xs",
-            rangkaianTerbuka ? "text-amber-700" : "text-emerald-700",
+            rangkaianTerbuka ? "text-muted-foreground" : "text-muted-foreground",
           )}
         >
           {rangkaianTerbuka
@@ -245,8 +245,8 @@ export function RangkaianPraktikum({
               label: "Saklar",
               value: saklarMenyala ? "ON" : "OFF",
               valueClassName: saklarMenyala
-                ? "text-emerald-700"
-                : "text-amber-700",
+                ? "text-muted-foreground"
+                : "text-muted-foreground",
             },
           ]}
         />

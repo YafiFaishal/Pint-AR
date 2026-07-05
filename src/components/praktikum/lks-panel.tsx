@@ -217,7 +217,7 @@ function StatusIndikator({ status }: { status: Status }) {
   if (status === "error") {
     return (
       <span
-        className={cn("flex items-center gap-1 text-xs text-amber-600")}
+        className={cn("flex items-center gap-1 text-xs text-muted-foreground")}
         title="Jawaban tetap tersimpan di perangkatmu"
       >
         <CloudOff className="size-3" /> Tersimpan lokal

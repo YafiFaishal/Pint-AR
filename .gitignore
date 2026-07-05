@@ -52,3 +52,6 @@ next-env.d.ts
 /testting/
 /scripts/ios-animated-usdz/last-run.log
 .vscode/
+.claude/
+.codex/
+.cursor/

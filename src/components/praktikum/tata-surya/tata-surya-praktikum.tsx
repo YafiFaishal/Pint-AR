@@ -206,7 +206,7 @@ export function TataSuryaPraktikum({
           {PLANET_INFO[planetTerpilih].label} · r = {jarakAktif.toFixed(2)} ·
           T² ∝ r³
         </p>
-        <p className="text-[10px] text-sky-700 lg:text-xs">
+        <p className="text-[10px] text-muted-foreground lg:text-xs">
           Semakin jauh dari Matahari, periode revolusi semakin panjang.
         </p>
       </div>
