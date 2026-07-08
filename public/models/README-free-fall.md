@@ -7,17 +7,17 @@ File untuk mode **Lihat AR** pada modul Gerak Jatuh Bebas. Simulasi 3D interakti
 | File | Platform | Status |
 |------|----------|--------|
 | `free-fall.glb` | Web, Android, WebXR, Scene Viewer | Dibuat otomatis via `npm run generate:free-fall-ar` |
-| `free-fall.usdz` | iPhone / iOS AR Quick Look | **Harus dikonversi manual** (lihat bawah) |
+| `free-fall.usdz` | iPhone / iOS AR Quick Look | **Konversi manual** setelah regenerate GLB (lihat bawah) |
 
-Isi model: **sama geometri & warna** dengan simulasi 3D (`jatuh-bebas-scene.tsx`) — lantai abu-abu lebar, menara kiri + garis tinggi, bola oranye di tengah, panah gravitasi merah kanan. Bola animasi jatuh looping.
+Isi model: **sama geometri & warna** dengan simulasi 3D (`jatuh-bebas-scene.tsx`) — lantai abu-abu lebar, menara kiri + garis tinggi, bola oranye di tengah, panah gravitasi merah ke bawah (rotasi 180°), label **h** dan **g** kecil (TextGeometry datar). Animasi `FreeFallDemo` (~5 s, loop).
 
-## Regenerasi GLB
+## Regenerasi GLB + USDZ (jika tool tersedia)
 
 ```bash
 npm run generate:free-fall-ar
 ```
 
-Skrip: `scripts/generate-free-fall-ar-model.mjs` (Three.js GLTFExporter).
+Skrip: `scripts/generate-free-fall-ar-model.mjs` (Three.js GLTFExporter). Jika `usdz_converter` (Xcode) terpasang, USDZ ikut di-generate otomatis.
 
 ## Konversi GLB → USDZ (iOS)
 
@@ -34,6 +34,8 @@ Node **tidak** menghasilkan USDZ secara native. Pilih salah satu:
 ```bash
 xcrun usdz_converter public/models/free-fall.glb public/models/free-fall.usdz
 ```
+
+> **Penting:** Setelah regenerate GLB, konversi ulang USDZ. File USDZ lama (visual panah terbalik) tidak boleh dipakai.
 
 ## Verifikasi
 

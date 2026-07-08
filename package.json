@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:tunnel": "bash scripts/dev-tunnel.sh",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
@@ -16,11 +17,21 @@
     "db:seed-tata-surya": "tsx src/db/seed-tata-surya.ts",
     "db:seed-jatuh-bebas": "tsx src/db/seed-jatuh-bebas.ts",
     "db:seed-reaksi-kimia": "tsx src/db/seed-reaksi-kimia.ts",
+    "db:seed-hukum-archimedes": "tsx src/db/seed-hukum-archimedes.ts",
+    "db:seed-cahaya-optik": "tsx src/db/seed-cahaya-optik.ts",
+    "db:seed-bandul-sederhana": "tsx src/db/seed-bandul-sederhana.ts",
+    "db:seed-hooke-spring": "tsx src/db/seed-hooke-spring.ts",
+    "db:seed-thermal-change": "tsx src/db/seed-thermal-change.ts",
     "generate:newton-ar": "node scripts/generate-newton-ar-model.mjs",
     "generate:circuit-ar": "node scripts/generate-circuit-ar-model.mjs",
     "generate:solar-ar": "node scripts/generate-solar-system-ar-model.mjs",
     "generate:free-fall-ar": "node scripts/generate-free-fall-ar-model.mjs",
-    "generate:chemistry-ar": "node scripts/generate-chemistry-reaction-ar-model.mjs"
+    "generate:chemistry-ar": "node scripts/generate-chemistry-reaction-ar-model.mjs",
+    "generate:archimedes-ar": "node scripts/generate-archimedes-ar-model.mjs",
+    "generate:light-optics-ar": "node scripts/generate-light-optics-ar-model.mjs",
+    "generate:simple-pendulum-ar": "node scripts/generate-simple-pendulum-ar-model.mjs",
+    "generate:hookes-law-ar": "node scripts/generate-hookes-law-ar-model.mjs",
+    "generate:thermal-change-ar": "node scripts/generate-thermal-change-ar-model.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",

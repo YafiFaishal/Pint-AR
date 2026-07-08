@@ -5,10 +5,18 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { toast } from "sonner";
 import { daftarAkun } from "@/app/(auth)/actions";
+import {
+  AuthField,
+  authCardClass,
+  authCardHeaderClass,
+  authFormClass,
+  authInputClass,
+  authLinkClass,
+  authSubmitClass,
+} from "@/components/auth/auth-form-primitives";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Card,
   CardContent,
@@ -19,9 +27,21 @@ import {
 
 type Role = "siswa" | "guru";
 
-const PILIHAN_PERAN: { value: Role; judul: string; deskripsi: string }[] = [
-  { value: "siswa", judul: "Siswa", deskripsi: "Saya akan mengikuti praktikum" },
-  { value: "guru", judul: "Guru", deskripsi: "Saya akan memantau kelas" },
+const PILIHAN_PERAN: {
+  value: Role;
+  judul: string;
+  deskripsi: string;
+}[] = [
+  {
+    value: "siswa",
+    judul: "Siswa",
+    deskripsi: "Mengikuti praktikum dan mengisi LKS",
+  },
+  {
+    value: "guru",
+    judul: "Guru",
+    deskripsi: "Memantau progres dan memberi nilai",
+  },
 ];
 
 export function RegisterForm() {
@@ -72,70 +92,82 @@ export function RegisterForm() {
   }
 
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader>
-        <CardTitle className="text-2xl">Daftar Akun</CardTitle>
-        <CardDescription>
-          Buat akun untuk mulai menggunakan PintAR.
+    <Card className={authCardClass}>
+      <CardHeader className={authCardHeaderClass}>
+        <CardTitle className="text-xl font-semibold leading-[1.2]">
+          Daftar Akun
+        </CardTitle>
+        <CardDescription className="text-sm leading-relaxed">
+          Pilih peran dan buat akun untuk mulai menggunakan PintAR.
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={onSubmit} className="flex flex-col gap-4">
-          <div className="grid gap-2">
-            <Label htmlFor="name">Nama Lengkap</Label>
-            <Input id="name" name="name" placeholder="Nama lengkap kamu" required />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="email">Email</Label>
+        <form onSubmit={onSubmit} className={authFormClass}>
+          <AuthField label="Nama Lengkap" htmlFor="name">
+            <Input
+              id="name"
+              name="name"
+              placeholder="Nama lengkap kamu"
+              className={authInputClass}
+              required
+            />
+          </AuthField>
+          <AuthField label="Email" htmlFor="email">
             <Input
               id="email"
               name="email"
               type="email"
               autoComplete="email"
               placeholder="nama@contoh.id"
+              className={authInputClass}
               required
             />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="password">Kata Sandi</Label>
+          </AuthField>
+          <AuthField label="Kata Sandi" htmlFor="password">
             <Input
               id="password"
               name="password"
               type="password"
               autoComplete="new-password"
               placeholder="Minimal 8 karakter"
+              className={authInputClass}
               required
             />
-          </div>
+          </AuthField>
 
-          <div className="grid gap-2">
-            <Label>Saya mendaftar sebagai</Label>
-            <div className="grid grid-cols-2 gap-3">
+          <AuthField label="Saya mendaftar sebagai">
+            <div
+              className="flex flex-col gap-3 sm:grid sm:grid-cols-2"
+              role="radiogroup"
+              aria-label="Pilih peran"
+            >
               {PILIHAN_PERAN.map((p) => (
                 <button
                   key={p.value}
                   type="button"
+                  role="radio"
+                  aria-checked={role === p.value}
                   onClick={() => setRole(p.value)}
-                  aria-pressed={role === p.value}
                   className={cn(
-                    "rounded-lg border p-3 text-left transition-colors",
+                    "rounded-xl border p-4 text-left transition-colors",
                     role === p.value
-                      ? "border-primary bg-primary/5 ring-1 ring-primary"
-                      : "border-border hover:bg-muted",
+                      ? "border-foreground bg-muted/30 ring-1 ring-foreground/10"
+                      : "border-border hover:bg-muted/20",
                   )}
                 >
-                  <span className="block font-medium">{p.judul}</span>
-                  <span className="block text-xs text-muted-foreground">
+                  <span className="block text-sm font-medium leading-snug">
+                    {p.judul}
+                  </span>
+                  <span className="mt-1 block text-xs leading-relaxed text-muted-foreground">
                     {p.deskripsi}
                   </span>
                 </button>
               ))}
             </div>
-          </div>
+          </AuthField>
 
           {role === "guru" ? (
-            <div className="grid gap-2">
-              <Label htmlFor="kodeGuru">Kode Guru</Label>
+            <AuthField label="Kode Guru" htmlFor="kodeGuru">
               <Input
                 id="kodeGuru"
                 name="kodeGuru"
@@ -143,29 +175,30 @@ export function RegisterForm() {
                 onChange={(e) => setKodeGuru(e.target.value)}
                 placeholder="Masukkan kode dari sekolah"
                 autoComplete="off"
+                className={authInputClass}
               />
-              <p className="text-xs text-muted-foreground">
-                Kode ini diberikan oleh sekolah untuk memverifikasi akun guru.
+              <p className="text-xs leading-relaxed text-muted-foreground">
+                Kode dari sekolah untuk verifikasi akun guru.
               </p>
-            </div>
+            </AuthField>
           ) : null}
 
           {error ? (
             <p
               role="alert"
-              className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive"
+              className="rounded-md bg-destructive/10 px-3 py-2 text-sm leading-relaxed text-destructive"
             >
               {error}
             </p>
           ) : null}
 
-          <Button type="submit" disabled={loading} className="w-full">
+          <Button type="submit" disabled={loading} className={authSubmitClass}>
             {loading ? "Memproses…" : "Daftar"}
           </Button>
 
-          <p className="text-center text-sm text-muted-foreground">
+          <p className="mt-5 text-center text-sm leading-relaxed text-muted-foreground">
             Sudah punya akun?{" "}
-            <Link href="/masuk" className="font-medium text-primary underline-offset-4 hover:underline">
+            <Link href="/masuk" className={authLinkClass}>
               Masuk di sini
             </Link>
           </p>

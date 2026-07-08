@@ -28,6 +28,47 @@ export function isReaksiKimiaModul(modul: Pick<Modul, "judul">): boolean {
   return modul.judul.toLowerCase().includes("reaksi kimia");
 }
 
+/** Modul dengan praktikum 3D interaktif (simulasi Hukum Archimedes). */
+export function isArchimedesModul(modul: Pick<Modul, "judul">): boolean {
+  return modul.judul.toLowerCase().includes("archimedes");
+}
+
+/** Modul dengan praktikum 3D interaktif (simulasi pemantulan & pembiasan cahaya). */
+export function isCahayaOptikModul(modul: Pick<Modul, "judul">): boolean {
+  const judul = modul.judul.toLowerCase();
+  return (
+    judul.includes("pemantulan") ||
+    judul.includes("pembiasan cahaya") ||
+    judul.includes("cahaya dan optik")
+  );
+}
+
+/** Modul dengan praktikum 3D interaktif (simulasi getaran bandul sederhana). */
+export function isBandulSederhanaModul(modul: Pick<Modul, "judul">): boolean {
+  const judul = modul.judul.toLowerCase();
+  return judul.includes("bandul") || judul.includes("getaran bandul");
+}
+
+/** Modul dengan praktikum 3D interaktif (simulasi Hukum Hooke & elastisitas pegas). */
+export function isHookeSpringModul(modul: Pick<Modul, "judul">): boolean {
+  const judul = modul.judul.toLowerCase();
+  return (
+    judul.includes("hooke") ||
+    judul.includes("elastisitas pegas") ||
+    (judul.includes("pegas") && judul.includes("elastis"))
+  );
+}
+
+/** Modul dengan praktikum 3D interaktif (simulasi kalor & perubahan suhu). */
+export function isThermalChangeModul(modul: Pick<Modul, "judul">): boolean {
+  const judul = modul.judul.toLowerCase();
+  return (
+    judul.includes("kalor") ||
+    judul.includes("perubahan suhu") ||
+    judul.includes("kalor-perubahan-suhu")
+  );
+}
+
 /** Modul praktikum interaktif (layout mobile khusus). */
 export function isPraktikumInteraktif(modul: Pick<Modul, "judul">): boolean {
   return (
@@ -35,7 +76,12 @@ export function isPraktikumInteraktif(modul: Pick<Modul, "judul">): boolean {
     isRangkaianModul(modul) ||
     isTataSuryaModul(modul) ||
     isJatuhBebasModul(modul) ||
-    isReaksiKimiaModul(modul)
+    isReaksiKimiaModul(modul) ||
+    isArchimedesModul(modul) ||
+    isCahayaOptikModul(modul) ||
+    isBandulSederhanaModul(modul) ||
+    isHookeSpringModul(modul) ||
+    isThermalChangeModul(modul)
   );
 }
 

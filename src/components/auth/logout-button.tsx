@@ -6,7 +6,11 @@ import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 
-export function LogoutButton() {
+export function LogoutButton({
+  variant = "outline",
+}: {
+  variant?: "outline" | "ghost";
+}) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
@@ -21,7 +25,7 @@ export function LogoutButton() {
 
   return (
     <Button
-      variant="outline"
+      variant={variant}
       size="sm"
       onClick={onLogout}
       disabled={loading}

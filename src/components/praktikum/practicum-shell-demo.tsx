@@ -17,6 +17,7 @@ export function PracticumShellDemo() {
   return (
     <PracticumShell
       title="Demo PracticumShell"
+      moduleId="00000000-0000-0000-0000-000000000000"
       badge={<Badge>Praktikum Interaktif</Badge>}
       scene={
         <div className="flex h-full items-center justify-center bg-gradient-to-br from-slate-900 to-slate-800">
@@ -59,12 +60,6 @@ export function PracticumShellDemo() {
             Panduan di bottom sheet.
           </p>
         </div>
-      }
-      lks={
-        <p className="text-sm text-muted-foreground">
-          Ini slot <code className="text-xs">lks</code>. Panel LKS asli akan
-          ditempatkan di sini saat migrasi.
-        </p>
       }
       arButton={
         <Button className="w-full gap-2" variant="outline" disabled>

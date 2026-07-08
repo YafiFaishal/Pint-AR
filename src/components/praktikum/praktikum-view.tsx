@@ -7,6 +7,11 @@ import { ArrowLeft, Rotate3d } from "lucide-react";
 import type { Modul, LangkahPraktikum } from "@/db/schema";
 import { ModelViewer, type ArStatus } from "@/components/model-viewer";
 import { ReaksiKimiaPraktikum } from "@/components/praktikum/reaksi-kimia/reaksi-kimia-praktikum";
+import { HookesLawPraktikum } from "@/components/praktikum/hukum-hooke/hookes-law-praktikum";
+import { ThermalChangePraktikum } from "@/components/praktikum/kalor-perubahan-suhu/thermal-change-praktikum";
+import { HukumArchimedesPraktikum } from "@/components/praktikum/hukum-archimedes/hukum-archimedes-praktikum";
+import { LightOpticsPraktikum } from "@/components/praktikum/cahaya-optik/light-optics-praktikum";
+import { SimplePendulumPraktikum } from "@/components/praktikum/bandul-sederhana/simple-pendulum-praktikum";
 import { JatuhBebasPraktikum } from "@/components/praktikum/jatuh-bebas/jatuh-bebas-praktikum";
 import { NewtonPraktikum } from "@/components/praktikum/newton/newton-praktikum";
 import { RangkaianPraktikum } from "@/components/praktikum/rangkaian/rangkaian-praktikum";
@@ -19,6 +24,11 @@ import {
   PanduanLangkah,
 } from "@/components/praktikum/panduan-langkah";
 import {
+  isArchimedesModul,
+  isBandulSederhanaModul,
+  isCahayaOptikModul,
+  isHookeSpringModul,
+  isThermalChangeModul,
   isJatuhBebasModul,
   isModulBelumSiap,
   isNewtonModul,
@@ -47,6 +57,11 @@ export function PraktikumView({
   const tataSurya = isTataSuryaModul(modul);
   const jatuhBebas = isJatuhBebasModul(modul);
   const reaksiKimia = isReaksiKimiaModul(modul);
+  const archimedes = isArchimedesModul(modul);
+  const cahayaOptik = isCahayaOptikModul(modul);
+  const bandulSederhana = isBandulSederhanaModul(modul);
+  const hookeSpring = isHookeSpringModul(modul);
+  const thermalChange = isThermalChangeModul(modul);
   const interaktif = isPraktikumInteraktif(modul);
   const belumSiap = isModulBelumSiap(modul);
 
@@ -114,6 +129,66 @@ export function PraktikumView({
   if (reaksiKimia) {
     return (
       <ReaksiKimiaPraktikum
+        modul={modul}
+        langkah={langkah}
+        arSupported={arTersedia}
+        onArAvailability={setArTersedia}
+        onArStatus={tanganiStatusAr}
+      />
+    );
+  }
+
+  if (archimedes) {
+    return (
+      <HukumArchimedesPraktikum
+        modul={modul}
+        langkah={langkah}
+        arSupported={arTersedia}
+        onArAvailability={setArTersedia}
+        onArStatus={tanganiStatusAr}
+      />
+    );
+  }
+
+  if (cahayaOptik) {
+    return (
+      <LightOpticsPraktikum
+        modul={modul}
+        langkah={langkah}
+        arSupported={arTersedia}
+        onArAvailability={setArTersedia}
+        onArStatus={tanganiStatusAr}
+      />
+    );
+  }
+
+  if (bandulSederhana) {
+    return (
+      <SimplePendulumPraktikum
+        modul={modul}
+        langkah={langkah}
+        arSupported={arTersedia}
+        onArAvailability={setArTersedia}
+        onArStatus={tanganiStatusAr}
+      />
+    );
+  }
+
+  if (hookeSpring) {
+    return (
+      <HookesLawPraktikum
+        modul={modul}
+        langkah={langkah}
+        arSupported={arTersedia}
+        onArAvailability={setArTersedia}
+        onArStatus={tanganiStatusAr}
+      />
+    );
+  }
+
+  if (thermalChange) {
+    return (
+      <ThermalChangePraktikum
         modul={modul}
         langkah={langkah}
         arSupported={arTersedia}

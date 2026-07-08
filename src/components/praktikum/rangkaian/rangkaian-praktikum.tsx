@@ -22,8 +22,11 @@ import {
 } from "@/lib/rangkaian-assets";
 import { PracticumShell } from "@/components/praktikum/practicum-shell";
 import { PanduanLangkah } from "@/components/praktikum/panduan-langkah";
-import { LksPanel } from "@/components/praktikum/lks-panel";
 import { PracticumQuickInfo } from "@/components/praktikum/practicum-quick-info";
+import {
+  PracticumResultStrip,
+  useValueHighlight,
+} from "@/components/praktikum/practicum-result-strip";
 import { RangkaianScene } from "./rangkaian-scene";
 
 type RangkaianPraktikumProps = {
@@ -51,6 +54,9 @@ export function RangkaianPraktikum({
   const arUrls = getRangkaianArModelUrls();
   const arus = tegangan / hambatan;
   const rangkaianTerbuka = !saklarMenyala;
+  const resultHighlight = useValueHighlight(
+    `${tegangan}-${hambatan}-${saklarMenyala}-${arus.toFixed(2)}`,
+  );
 
   const arTombol = useMemo(
     () => getRangkaianArButtonState(arAssets),
@@ -127,7 +133,7 @@ export function RangkaianPraktikum({
   );
 
   const controls = (
-    <div className="space-y-2 lg:space-y-3">
+    <div className="space-y-3">
       <div className="flex items-center justify-between gap-2">
         <span className="text-xs font-medium">Saklar</span>
         <Button
@@ -139,10 +145,10 @@ export function RangkaianPraktikum({
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 gap-2 min-[420px]:grid-cols-2 lg:gap-3">
-        <div className="space-y-1">
+      <div className="space-y-3">
+        <div className="space-y-1.5">
           <div className="flex items-center justify-between text-xs">
-            <span className="font-medium">Tegangan (V)</span>
+            <span className="font-medium">Tegangan</span>
             <span className="text-muted-foreground tabular-nums">
               {tegangan} V
             </span>
@@ -157,9 +163,9 @@ export function RangkaianPraktikum({
             }
           />
         </div>
-        <div className="space-y-1">
+        <div className="space-y-1.5">
           <div className="flex items-center justify-between text-xs">
-            <span className="font-medium">Hambatan (R)</span>
+            <span className="font-medium">Hambatan</span>
             <span className="text-muted-foreground tabular-nums">
               {hambatan} Ω
             </span>
@@ -176,29 +182,17 @@ export function RangkaianPraktikum({
         </div>
       </div>
 
-      <div className="rounded-md border bg-muted/40 px-2.5 py-1.5 text-xs lg:px-3 lg:py-2 lg:text-sm">
-        <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-0.5">
-          <span className="font-medium">Arus (I = V / R)</span>
-          <span className="shrink-0 font-semibold tabular-nums">
-            {arus.toFixed(2)} A
-          </span>
-        </div>
-        <p className="mt-0.5 text-[10px] text-muted-foreground tabular-nums lg:text-xs">
-          V = {tegangan} V · R = {hambatan} Ω
-        </p>
-        <p
-          className={cn(
-            "text-[10px] lg:text-xs",
-            rangkaianTerbuka ? "text-muted-foreground" : "text-muted-foreground",
-          )}
-        >
-          {rangkaianTerbuka
+      <PracticumResultStrip
+        label="Arus"
+        value={`${arus.toFixed(2)} A`}
+        detail={`V ${tegangan} V · R ${hambatan} Ω`}
+        status={`${
+          rangkaianTerbuka
             ? "Rangkaian terbuka — arus tidak mengalir"
-            : "Rangkaian tertutup — arus mengalir"}
-          {" · "}
-          Lampu {saklarMenyala ? "menyala" : "mati"}
-        </p>
-      </div>
+            : "Rangkaian tertutup — arus mengalir"
+        } · Lampu ${saklarMenyala ? "menyala" : "mati"}`}
+        highlight={resultHighlight}
+      />
     </div>
   );
 
@@ -231,6 +225,7 @@ export function RangkaianPraktikum({
   return (
     <PracticumShell
       title={modul.judul}
+      moduleId={modul.id}
       badge={badge}
       scene={scene}
       quickInfo={
@@ -260,9 +255,7 @@ export function RangkaianPraktikum({
           rangkaian
         />
       }
-      lks={<LksPanel moduleId={modul.id} />}
       arButton={arButton}
-      sceneClassName="max-lg:min-h-0 max-lg:flex-1 max-lg:shrink"
     />
   );
 }

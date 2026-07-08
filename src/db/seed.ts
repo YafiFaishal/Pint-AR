@@ -16,6 +16,11 @@ async function seed() {
   const modulTataSuryaId = randomUUID();
   const modulJatuhBebasId = randomUUID();
   const modulReaksiKimiaId = randomUUID();
+  const modulArchimedesId = randomUUID();
+  const modulCahayaOptikId = randomUUID();
+  const modulBandulId = randomUUID();
+  const modulHookeId = randomUUID();
+  const modulThermalId = randomUUID();
 
   await db.insert(modul).values([
     {
@@ -62,6 +67,46 @@ async function seed() {
       modelUsdzUrl: null,
       deskripsi:
         "Campurkan bahan kimia untuk mengamati perubahan suhu, pH, dan warna.",
+    },
+    {
+      id: modulArchimedesId,
+      judul: "Hukum Archimedes",
+      modelGlbUrl: null,
+      modelUsdzUrl: null,
+      deskripsi:
+        "Uji pengaruh massa, volume, dan jenis cairan terhadap kondisi terapung, melayang, atau tenggelam.",
+    },
+    {
+      id: modulCahayaOptikId,
+      judul: "Pemantulan dan Pembiasan Cahaya",
+      modelGlbUrl: null,
+      modelUsdzUrl: null,
+      deskripsi:
+        "Amati arah cahaya saat dipantulkan dan dibiaskan pada medium yang berbeda.",
+    },
+    {
+      id: modulBandulId,
+      judul: "Getaran Bandul Sederhana",
+      modelGlbUrl: null,
+      modelUsdzUrl: null,
+      deskripsi:
+        "Amati pengaruh panjang tali, gravitasi, dan massa terhadap periode ayunan bandul.",
+    },
+    {
+      id: modulHookeId,
+      judul: "Hukum Hooke dan Elastisitas Pegas",
+      modelGlbUrl: null,
+      modelUsdzUrl: null,
+      deskripsi:
+        "Amati hubungan gaya, pertambahan panjang, konstanta pegas, dan getaran massa–pegas.",
+    },
+    {
+      id: modulThermalId,
+      judul: "Kalor dan Perubahan Suhu",
+      modelGlbUrl: null,
+      modelUsdzUrl: null,
+      deskripsi:
+        "Amati pengaruh massa, kalor jenis, dan energi pemanas terhadap perubahan suhu suatu zat.",
     },
   ]);
 
@@ -168,6 +213,46 @@ async function seed() {
       judul: "Praktikum Sedang Disiapkan",
       instruksi:
         "Simulasi pencampuran bahan kimia sedang dikembangkan. Pantau pembaruan berikutnya.",
+    },
+    {
+      id: randomUUID(),
+      modulId: modulArchimedesId,
+      urutan: 1,
+      judul: "Praktikum Sedang Disiapkan",
+      instruksi:
+        "Simulasi Hukum Archimedes sedang dikembangkan. Pantau pembaruan berikutnya.",
+    },
+    {
+      id: randomUUID(),
+      modulId: modulCahayaOptikId,
+      urutan: 1,
+      judul: "Praktikum Sedang Disiapkan",
+      instruksi:
+        "Simulasi pemantulan dan pembiasan cahaya sedang dikembangkan. Pantau pembaruan berikutnya.",
+    },
+    {
+      id: randomUUID(),
+      modulId: modulBandulId,
+      urutan: 1,
+      judul: "Praktikum Sedang Disiapkan",
+      instruksi:
+        "Simulasi getaran bandul sederhana sedang dikembangkan. Pantau pembaruan berikutnya.",
+    },
+    {
+      id: randomUUID(),
+      modulId: modulHookeId,
+      urutan: 1,
+      judul: "Praktikum Sedang Disiapkan",
+      instruksi:
+        "Simulasi Hukum Hooke dan elastisitas pegas sedang dikembangkan. Pantau pembaruan berikutnya.",
+    },
+    {
+      id: randomUUID(),
+      modulId: modulThermalId,
+      urutan: 1,
+      judul: "Praktikum Sedang Disiapkan",
+      instruksi:
+        "Simulasi kalor dan perubahan suhu sedang dikembangkan. Pantau pembaruan berikutnya.",
     },
   ]);
 

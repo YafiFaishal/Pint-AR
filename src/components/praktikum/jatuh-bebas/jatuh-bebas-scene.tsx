@@ -20,17 +20,83 @@ const MAT_BOLA = { color: "#ea580c", metalness: 0.28, roughness: 0.38 } as const
 const MAT_LANTAI = { color: "#94a3b8", metalness: 0.08, roughness: 0.62 } as const;
 const MAT_PANAH = { color: "#dc2626", metalness: 0.12, roughness: 0.5 } as const;
 
-/** Label huruf kecil saja — tanpa angka, tidak menutupi objek utama. */
+const KEPALA_TINGGI = 0.048;
+const LABEL_FONT_PX = 9;
+
+/** Panjang batang + posisi ujung panah (relatif pusat). */
+function dimensiPanah(panjang: number): { batang: number; ujungY: number } {
+  const batang = Math.max(panjang - KEPALA_TINGGI * 0.55, 0.07);
+  const ujungY = batang + KEPALA_TINGGI * 0.42;
+  return { batang, ujungY };
+}
+
+/** Geometri panah vertikal ke atas — diputar 180° untuk arah ke bawah. */
+function PanahKeAtas({
+  panjang,
+  warna,
+}: {
+  panjang: number;
+  warna: { color: string; metalness: number; roughness: number };
+}) {
+  const { batang, ujungY } = dimensiPanah(panjang);
+  const r = 0.0075;
+
+  return (
+    <group>
+      <mesh position={[0, batang / 2, 0]} castShadow>
+        <cylinderGeometry args={[r, r * 1.12, batang, 10]} />
+        <meshStandardMaterial {...warna} />
+      </mesh>
+      <mesh position={[0, ujungY, 0]} castShadow>
+        <coneGeometry args={[0.02, KEPALA_TINGGI, 10]} />
+        <meshStandardMaterial {...warna} />
+      </mesh>
+    </group>
+  );
+}
+
+function PanahKeBawah({
+  panjang,
+  warna,
+}: {
+  panjang: number;
+  warna: { color: string; metalness: number; roughness: number };
+}) {
+  return (
+    <group rotation={[Math.PI, 0, 0]}>
+      <PanahKeAtas panjang={panjang} warna={warna} />
+    </group>
+  );
+}
+
+/** Label simbol kecil — ukuran pixel tetap, konsisten dengan modul Archimedes. */
 function LabelSimbol({
   teks,
   posisi,
+  warna = "#475569",
 }: {
   teks: string;
   posisi: [number, number, number];
+  warna?: string;
 }) {
   return (
-    <Html position={posisi} center distanceFactor={16} zIndexRange={[5, 0]}>
-      <span className="pointer-events-none select-none text-[9px] font-semibold leading-none text-slate-600/90">
+    <Html
+      position={posisi}
+      center
+      transform={false}
+      zIndexRange={[10, 0]}
+      style={{ pointerEvents: "none" }}
+    >
+      <span
+        className="pointer-events-none select-none whitespace-nowrap font-semibold leading-none"
+        style={{
+          fontSize: LABEL_FONT_PX,
+          fontFamily: "system-ui, -apple-system, sans-serif",
+          color: warna,
+          WebkitTextStroke: "0.25px #ffffff",
+          paintOrder: "stroke fill",
+        }}
+      >
         {teks}
       </span>
     </Html>
@@ -39,22 +105,18 @@ function LabelSimbol({
 
 function PanahGravitasi({ tinggiMeter }: { tinggiMeter: number }) {
   const h = tinggiMeter * METER_TO_UNIT;
-  const panjang = Math.min(0.38 + h * 0.08, 0.62);
-  const kepala = 0.07;
-  const batang = Math.max(panjang - kepala * 0.5, 0.12);
+  const panjang = Math.min(0.28 + h * 0.06, 0.42);
   const y = h * 0.55 + TINGGI_LANTAI + 0.05;
+  const { ujungY } = dimensiPanah(panjang);
 
   return (
     <group position={[0.78, y, 0.42]}>
-      <mesh position={[0, -batang / 2, 0]} castShadow>
-        <cylinderGeometry args={[0.014, 0.018, batang, 8]} />
-        <meshStandardMaterial {...MAT_PANAH} />
-      </mesh>
-      <mesh position={[0, -batang - kepala * 0.32, 0]} castShadow>
-        <coneGeometry args={[0.034, kepala, 8]} />
-        <meshStandardMaterial {...MAT_PANAH} />
-      </mesh>
-      <LabelSimbol teks="g" posisi={[0.1, -batang * 0.42, 0]} />
+      <PanahKeBawah panjang={panjang} warna={MAT_PANAH} />
+      <LabelSimbol
+        teks="g"
+        posisi={[0.038, -(ujungY + 0.022), 0]}
+        warna="#b91c1c"
+      />
     </group>
   );
 }
@@ -96,7 +158,7 @@ function Menara({ tinggiMeter }: { tinggiMeter: number }) {
         <meshStandardMaterial color="#cbd5e1" metalness={0.1} roughness={0.5} />
       </mesh>
 
-      <LabelSimbol teks="h" posisi={[-0.14, midY, 0.12]} />
+      <LabelSimbol teks="h" posisi={[-0.1, midY, 0.1]} warna="#475569" />
     </group>
   );
 }

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { AuthShell, AuthNavLink } from "@/components/auth/auth-shell";
 import { RegisterForm } from "@/components/auth/register-form";
 
 export const metadata: Metadata = {
@@ -6,5 +7,19 @@ export const metadata: Metadata = {
 };
 
 export default function DaftarPage() {
-  return <RegisterForm />;
+  return (
+    <AuthShell
+      variant="register"
+      headerRight={
+        <>
+          <AuthNavLink href="/masuk">Masuk</AuthNavLink>
+          <AuthNavLink href="/daftar" active>
+            Daftar
+          </AuthNavLink>
+        </>
+      }
+    >
+      <RegisterForm />
+    </AuthShell>
+  );
 }

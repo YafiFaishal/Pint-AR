@@ -31,8 +31,11 @@ import {
 } from "@/lib/tata-surya-assets";
 import { PracticumShell } from "@/components/praktikum/practicum-shell";
 import { PracticumQuickInfo } from "@/components/praktikum/practicum-quick-info";
+import {
+  PracticumResultStrip,
+  useValueHighlight,
+} from "@/components/praktikum/practicum-result-strip";
 import { PanduanLangkah } from "@/components/praktikum/panduan-langkah";
-import { LksPanel } from "@/components/praktikum/lks-panel";
 import { TataSuryaScene } from "./tata-surya-scene";
 
 type TataSuryaPraktikumProps = {
@@ -60,6 +63,9 @@ export function TataSuryaPraktikum({
   const arUrls = getTataSuryaArModelUrls();
   const jarakAktif = jarakOrbit[planetTerpilih];
   const periode = hitungPeriodeRelatif(jarakAktif);
+  const resultHighlight = useValueHighlight(
+    `${planetTerpilih}-${jarakAktif.toFixed(2)}-${periode.toFixed(2)}`,
+  );
 
   const arTombol = useMemo(
     () => getTataSuryaArButtonState(arAssets),
@@ -141,8 +147,8 @@ export function TataSuryaPraktikum({
   );
 
   const controls = (
-    <div className="space-y-2 lg:space-y-3">
-      <div className="space-y-1">
+    <div className="space-y-3">
+      <div className="space-y-1.5">
         <span className="text-xs font-medium">Pilih Planet</span>
         <div className="grid grid-cols-2 gap-1.5 min-[420px]:grid-cols-4">
           {PLANET_IDS.map((id) => (
@@ -158,8 +164,8 @@ export function TataSuryaPraktikum({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-2 min-[420px]:grid-cols-2 lg:gap-3">
-        <div className="space-y-1">
+      <div className="space-y-3">
+        <div className="space-y-1.5">
           <div className="flex items-center justify-between text-xs">
             <span className="font-medium">Kecepatan Simulasi</span>
             <span className="text-muted-foreground tabular-nums">
@@ -176,9 +182,9 @@ export function TataSuryaPraktikum({
             }
           />
         </div>
-        <div className="space-y-1">
+        <div className="space-y-1.5">
           <div className="flex items-center justify-between text-xs">
-            <span className="font-medium">Jarak Orbit (r)</span>
+            <span className="font-medium">Jarak Orbit</span>
             <span className="text-muted-foreground tabular-nums">
               {jarakAktif.toFixed(2)}
             </span>
@@ -195,21 +201,13 @@ export function TataSuryaPraktikum({
         </div>
       </div>
 
-      <div className="hidden rounded-md border bg-muted/40 px-2.5 py-1.5 text-xs lg:block lg:px-3 lg:py-2 lg:text-sm">
-        <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-0.5">
-          <span className="font-medium">Periode Orbit (T = √r³)</span>
-          <span className="shrink-0 font-semibold tabular-nums">
-            {periode.toFixed(2)} sat
-          </span>
-        </div>
-        <p className="mt-0.5 text-[10px] text-muted-foreground tabular-nums lg:text-xs">
-          {PLANET_INFO[planetTerpilih].label} · r = {jarakAktif.toFixed(2)} ·
-          T² ∝ r³
-        </p>
-        <p className="text-[10px] text-muted-foreground lg:text-xs">
-          Semakin jauh dari Matahari, periode revolusi semakin panjang.
-        </p>
-      </div>
+      <PracticumResultStrip
+        label="Planet"
+        value={PLANET_INFO[planetTerpilih].label}
+        detail={`r ${jarakAktif.toFixed(2)} · T ${periode.toFixed(2)}`}
+        status="Semakin jauh dari Matahari, periode revolusi semakin panjang."
+        highlight={resultHighlight}
+      />
     </div>
   );
 
@@ -242,6 +240,7 @@ export function TataSuryaPraktikum({
   return (
     <PracticumShell
       title={modul.judul}
+      moduleId={modul.id}
       badge={badge}
       scene={scene}
       quickInfo={
@@ -266,9 +265,7 @@ export function TataSuryaPraktikum({
           tataSurya
         />
       }
-      lks={<LksPanel moduleId={modul.id} />}
       arButton={arButton}
-      sceneClassName="max-lg:min-h-0 max-lg:flex-1 max-lg:shrink"
     />
   );
 }

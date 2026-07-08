@@ -30,8 +30,11 @@ import {
 } from "@/lib/jatuh-bebas-utils";
 import { PracticumShell } from "@/components/praktikum/practicum-shell";
 import { PanduanLangkah } from "@/components/praktikum/panduan-langkah";
-import { LksPanel } from "@/components/praktikum/lks-panel";
 import { PracticumQuickInfo } from "@/components/praktikum/practicum-quick-info";
+import {
+  PracticumResultStrip,
+  useValueHighlight,
+} from "@/components/praktikum/practicum-result-strip";
 import { JatuhBebasScene } from "./jatuh-bebas-scene";
 
 type JatuhBebasPraktikumProps = {
@@ -67,6 +70,9 @@ export function JatuhBebasPraktikum({
   const tampilanKecepatan = simState.falling
     ? hitungKecepatanSaatIni(gravitasi, mode, simState.elapsed)
     : kecepatanTeoritis;
+  const resultHighlight = useValueHighlight(
+    `${tampilanWaktu.toFixed(2)}-${tampilanKecepatan.toFixed(1)}-${mode}`,
+  );
 
   const arTombol = useMemo(
     () => getJatuhBebasArButtonState(arAssets),
@@ -156,10 +162,10 @@ export function JatuhBebasPraktikum({
   );
 
   const controls = (
-    <div className="space-y-1.5 lg:space-y-3">
-      <div className="space-y-1">
+    <div className="space-y-3">
+      <div className="space-y-1.5">
         <div className="flex items-center justify-between text-xs">
-          <span className="font-medium">Ketinggian (h)</span>
+          <span className="font-medium">Ketinggian</span>
           <span className="text-muted-foreground tabular-nums">{tinggi} m</span>
         </div>
         <Slider
@@ -171,9 +177,9 @@ export function JatuhBebasPraktikum({
         />
       </div>
 
-      <div className="space-y-1">
+      <div className="space-y-1.5">
         <div className="flex items-center justify-between text-xs">
-          <span className="font-medium">Gravitasi (g)</span>
+          <span className="font-medium">Gravitasi</span>
           <span className="text-muted-foreground tabular-nums">
             {gravitasi.toFixed(1)} m/s²
           </span>
@@ -187,13 +193,13 @@ export function JatuhBebasPraktikum({
         />
       </div>
 
-      <div className="space-y-1">
-        <span className="text-xs font-medium">Lingkungan</span>
-        <div className="grid grid-cols-2 gap-1.5">
+      <div className="space-y-1.5">
+        <span className="text-xs font-medium leading-snug">Lingkungan</span>
+        <div className="grid grid-cols-2 gap-2 rounded-xl border bg-muted/40 p-1">
           <Button
             type="button"
             variant={mode === "udara" ? "default" : "outline"}
-            className="min-h-9 text-xs"
+            className="min-h-10 rounded-lg text-xs"
             onClick={() => setMode("udara")}
           >
             Udara
@@ -201,7 +207,7 @@ export function JatuhBebasPraktikum({
           <Button
             type="button"
             variant={mode === "hampa" ? "default" : "outline"}
-            className="min-h-9 text-xs"
+            className="min-h-10 rounded-lg text-xs"
             onClick={() => setMode("hampa")}
           >
             Hampa
@@ -209,23 +215,20 @@ export function JatuhBebasPraktikum({
         </div>
       </div>
 
-      <div className="flex items-center justify-between gap-2 rounded-md border bg-muted/30 px-2.5 py-1.5 text-[11px] lg:text-xs">
-        <span className="tabular-nums">
-          <span className="font-medium text-muted-foreground">t </span>
-          {tampilanWaktu.toFixed(2)} s
-        </span>
-        <span className="tabular-nums">
-          <span className="font-medium text-muted-foreground">v </span>
-          {tampilanKecepatan.toFixed(1)} m/s
-        </span>
-      </div>
+      <PracticumResultStrip
+        label="Waktu"
+        value={`${tampilanWaktu.toFixed(2)} s`}
+        detail={`Kecepatan ${tampilanKecepatan.toFixed(1)} m/s`}
+        status={`Lingkungan: ${mode === "udara" ? "Udara" : "Hampa"}`}
+        highlight={resultHighlight}
+      />
 
-      <div className="grid grid-cols-2 gap-2">
-        <Button className="min-h-10 lg:min-h-11" onClick={handleJatuhkan}>
+      <div className="grid grid-cols-2 gap-2.5">
+        <Button className="min-h-12" onClick={handleJatuhkan}>
           Jatuhkan
         </Button>
         <Button
-          className="min-h-10 lg:min-h-11"
+          className="min-h-12"
           variant="outline"
           onClick={handleReset}
         >
@@ -236,10 +239,10 @@ export function JatuhBebasPraktikum({
   );
 
   const arButton = (
-    <div className="space-y-0.5 pb-[calc(4.5rem+env(safe-area-inset-bottom,0px))] lg:pb-0">
+    <div className="space-y-1">
       <Button
         className={cn(
-          "flex h-11 min-h-11 w-full items-center justify-center gap-2 border-2 px-4 py-0 text-sm leading-normal font-medium lg:h-[52px] lg:min-h-[52px]",
+          "flex min-h-[52px] w-full items-center justify-center gap-2 border-2 px-4 py-0 text-sm leading-normal font-medium",
           arTombolAktif
             ? "border-primary bg-primary text-primary-foreground hover:bg-primary/90"
             : "border-primary/50 bg-primary/5 text-foreground hover:bg-primary/10",
@@ -264,6 +267,7 @@ export function JatuhBebasPraktikum({
   return (
     <PracticumShell
       title={modul.judul}
+      moduleId={modul.id}
       badge={badge}
       scene={scene}
       quickInfo={
@@ -286,14 +290,11 @@ export function JatuhBebasPraktikum({
         />
       }
       mobileQuickInfoBelowScene
-      mobileSheetPadding="large"
       controls={controls}
       guide={
         <PanduanLangkah langkah={langkah} arAktif={arAktif} jatuhBebas />
       }
-      lks={<LksPanel moduleId={modul.id} />}
       arButton={arButton}
-      sceneClassName="max-lg:min-h-[55svh] max-lg:max-h-[65svh] max-lg:flex-none max-lg:shrink-0 lg:min-h-0 lg:flex-1"
     />
   );
 }

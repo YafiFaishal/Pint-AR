@@ -5,9 +5,17 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
+import {
+  AuthField,
+  authCardClass,
+  authCardHeaderClass,
+  authFormClass,
+  authInputClass,
+  authLinkClass,
+  authSubmitClass,
+} from "@/components/auth/auth-form-primitives";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Card,
   CardContent,
@@ -59,59 +67,70 @@ export function LoginForm() {
   }
 
   return (
-    <Card className="w-full max-w-sm">
-      <CardHeader>
-        <CardTitle className="text-2xl">Masuk</CardTitle>
-        <CardDescription>
-          Masuk untuk melanjutkan praktikum atau memantau kelas.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={onSubmit} className="flex flex-col gap-4">
-          <div className="grid gap-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              autoComplete="email"
-              placeholder="nama@contoh.id"
-              required
-            />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="password">Kata Sandi</Label>
-            <Input
-              id="password"
-              name="password"
-              type="password"
-              autoComplete="current-password"
-              placeholder="••••••••"
-              required
-            />
-          </div>
+    <div className="w-full">
+      <Card className={authCardClass}>
+        <CardHeader className={authCardHeaderClass}>
+          <CardTitle className="text-xl font-semibold leading-[1.2]">
+            Masuk
+          </CardTitle>
+          <CardDescription className="text-sm leading-relaxed">
+            Lanjutkan praktikum, isi LKS, atau pantau kelas.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={onSubmit} className={authFormClass}>
+            <AuthField label="Email" htmlFor="email">
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                placeholder="nama@contoh.id"
+                className={authInputClass}
+                required
+              />
+            </AuthField>
+            <AuthField label="Kata Sandi" htmlFor="password">
+              <Input
+                id="password"
+                name="password"
+                type="password"
+                autoComplete="current-password"
+                placeholder="••••••••"
+                className={authInputClass}
+                required
+              />
+            </AuthField>
 
-          {error ? (
-            <p
-              role="alert"
-              className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive"
+            {error ? (
+              <p
+                role="alert"
+                className="rounded-md bg-destructive/10 px-3 py-2 text-sm leading-relaxed text-destructive"
+              >
+                {error}
+              </p>
+            ) : null}
+
+            <Button
+              type="submit"
+              disabled={loading}
+              className={authSubmitClass}
             >
-              {error}
+              {loading ? "Memproses…" : "Masuk"}
+            </Button>
+
+            <p className="mt-5 text-center text-sm leading-relaxed text-muted-foreground">
+              Belum punya akun?{" "}
+              <Link href="/daftar" className={authLinkClass}>
+                Daftar di sini
+              </Link>
             </p>
-          ) : null}
-
-          <Button type="submit" disabled={loading} className="w-full">
-            {loading ? "Memproses…" : "Masuk"}
-          </Button>
-
-          <p className="text-center text-sm text-muted-foreground">
-            Belum punya akun?{" "}
-            <Link href="/daftar" className="font-medium text-primary underline-offset-4 hover:underline">
-              Daftar di sini
-            </Link>
-          </p>
-        </form>
-      </CardContent>
-    </Card>
+          </form>
+        </CardContent>
+      </Card>
+      <p className="mt-7 text-center text-xs leading-relaxed text-muted-foreground">
+        Akses siswa dan guru menggunakan akun yang terdaftar.
+      </p>
+    </div>
   );
 }

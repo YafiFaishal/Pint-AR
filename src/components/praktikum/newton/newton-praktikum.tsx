@@ -22,8 +22,11 @@ import {
 } from "@/lib/newton-assets";
 import { PracticumShell } from "@/components/praktikum/practicum-shell";
 import { PanduanLangkah } from "@/components/praktikum/panduan-langkah";
-import { LksPanel } from "@/components/praktikum/lks-panel";
 import { PracticumQuickInfo } from "@/components/praktikum/practicum-quick-info";
+import {
+  PracticumResultStrip,
+  useValueHighlight,
+} from "@/components/praktikum/practicum-result-strip";
 import { NewtonScene } from "./newton-scene";
 
 type NewtonPraktikumProps = {
@@ -51,6 +54,9 @@ export function NewtonPraktikum({
 
   const arUrls = getNewtonArModelUrls();
   const acceleration = force / mass;
+  const resultHighlight = useValueHighlight(
+    `${force}-${mass}-${acceleration.toFixed(2)}`,
+  );
   const arTombol = useMemo(
     () => getNewtonArButtonState(arAssets),
     [arAssets],
@@ -130,11 +136,11 @@ export function NewtonPraktikum({
   );
 
   const controls = (
-    <div className="space-y-2 lg:space-y-3">
-      <div className="grid grid-cols-1 gap-2 min-[420px]:grid-cols-2 lg:gap-3">
-        <div className="space-y-1">
+    <div className="space-y-3">
+      <div className="space-y-3">
+        <div className="space-y-1.5">
           <div className="flex items-center justify-between text-xs">
-            <span className="font-medium">Massa (m)</span>
+            <span className="font-medium">Massa</span>
             <span className="text-muted-foreground tabular-nums">{mass} kg</span>
           </div>
           <Slider
@@ -145,9 +151,9 @@ export function NewtonPraktikum({
             onValueChange={(v) => setMass(Array.isArray(v) ? v[0] : v)}
           />
         </div>
-        <div className="space-y-1">
+        <div className="space-y-1.5">
           <div className="flex items-center justify-between text-xs">
-            <span className="font-medium">Gaya (F)</span>
+            <span className="font-medium">Gaya</span>
             <span className="text-muted-foreground tabular-nums">{force} N</span>
           </div>
           <Slider
@@ -160,18 +166,18 @@ export function NewtonPraktikum({
         </div>
       </div>
 
-      <div className="flex items-center justify-between gap-2 rounded-md border bg-muted/40 px-2.5 py-1.5 text-xs lg:px-3 lg:py-2 lg:text-sm">
-        <span className="font-medium">Percepatan (a = F / m)</span>
-        <span className="shrink-0 font-semibold tabular-nums">
-          {acceleration.toFixed(2)} m/s²
-        </span>
-      </div>
+      <PracticumResultStrip
+        label="Percepatan"
+        value={`${acceleration.toFixed(2)} m/s²`}
+        detail={`F ${force} N · m ${mass} kg`}
+        highlight={resultHighlight}
+      />
 
-      <div className="grid grid-cols-2 gap-2">
-        <Button className="min-h-11" onClick={handleDorong}>
+      <div className="grid grid-cols-2 gap-2.5">
+        <Button className="min-h-12" onClick={handleDorong}>
           Dorong
         </Button>
-        <Button className="min-h-11" variant="outline" onClick={handleReset}>
+        <Button className="min-h-12" variant="outline" onClick={handleReset}>
           Reset
         </Button>
       </div>
@@ -207,6 +213,7 @@ export function NewtonPraktikum({
   return (
     <PracticumShell
       title={modul.judul}
+      moduleId={modul.id}
       badge={badge}
       scene={scene}
       quickInfo={
@@ -227,9 +234,7 @@ export function NewtonPraktikum({
       guide={
         <PanduanLangkah langkah={langkah} arAktif={arAktif} newton />
       }
-      lks={<LksPanel moduleId={modul.id} />}
       arButton={arButton}
-      sceneClassName="max-lg:min-h-[55svh] max-lg:max-h-[65svh] max-lg:flex-none max-lg:shrink-0 lg:min-h-0 lg:flex-1"
     />
   );
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
 export type PracticumQuickInfoItem = {
@@ -7,69 +8,109 @@ export type PracticumQuickInfoItem = {
   label: string;
   value: string;
   valueClassName?: string;
-  sub?: string;
-  subClassName?: string;
 };
 
 type PracticumQuickInfoProps = {
   items: PracticumQuickInfoItem[];
-  /** Jumlah kolom grid — default 3 (Tata Surya, Newton) */
   columns?: 3 | 4;
-  /** Strip lebih pendek untuk mobile (4 kolom rapat) */
-  compact?: boolean;
+  /** Kolom grid di layar < sm (640px). Default: sama dengan `columns`. */
+  mobileColumns?: 2 | 3 | 4;
+  /** Izinkan value wrap; hilangkan truncate (untuk teks panjang seperti indeks bias). */
+  wrapValues?: boolean;
+  /** Key item yang boleh wrap maksimal 2 baris (mis. status). */
+  clampValueKeys?: string[];
 };
 
 const CARD_CLASS =
-  "min-w-0 rounded-md border bg-background text-center shadow-sm lg:bg-background/90 lg:backdrop-blur-sm";
+  "flex min-h-[4rem] min-w-0 flex-col items-center justify-center rounded-[14px] border bg-background px-1.5 py-2 text-center transition-colors duration-300 sm:min-h-[4.25rem]";
 
-const LABEL_CLASS = "font-medium text-muted-foreground";
-const VALUE_CLASS = "truncate font-semibold tabular-nums whitespace-nowrap";
+const CARD_CLASS_WRAP =
+  "flex min-h-[3.5rem] min-w-0 flex-col items-center justify-center rounded-[14px] border bg-background px-1 py-1.5 text-center transition-colors duration-300 sm:min-h-[4.25rem] sm:px-1.5 sm:py-2";
 
-const GRID_CLASS = {
-  3: "grid w-full grid-cols-3 gap-1.5 lg:gap-2",
-  4: "grid w-full grid-cols-4 gap-1.5 lg:gap-2",
-} as const;
+const LABEL_CLASS =
+  "text-[12px] font-medium leading-none text-muted-foreground sm:text-[13px]";
+const VALUE_CLASS =
+  "mt-1 w-full truncate text-[15px] font-semibold tabular-nums leading-tight sm:text-[16px]";
+const VALUE_WRAP_CLASS =
+  "mt-1 w-full min-w-0 whitespace-normal break-words text-[clamp(0.8125rem,2.6vw,1rem)] font-semibold tabular-nums leading-snug [overflow-wrap:anywhere] sm:text-[16px] sm:leading-tight";
 
-const COMPACT_GRID_CLASS = {
-  3: "grid w-full grid-cols-3 gap-1",
-  4: "grid w-full grid-cols-4 gap-1",
-} as const;
+function useChangedKeys(items: PracticumQuickInfoItem[]) {
+  const [changed, setChanged] = useState<Set<string>>(new Set());
+  const prev = useRef<Record<string, string>>({});
 
-/**
- * Ringkasan nilai di bawah scene (mobile) / overlay scene (desktop).
- * Pola visual mengikuti modul Tata Surya.
- */
+  useEffect(() => {
+    const next = new Set<string>();
+    for (const item of items) {
+      if (
+        prev.current[item.key] !== undefined &&
+        prev.current[item.key] !== item.value
+      ) {
+        next.add(item.key);
+      }
+      prev.current[item.key] = item.value;
+    }
+    if (next.size === 0) return;
+
+    let clearHighlight: ReturnType<typeof setTimeout> | undefined;
+    const show = setTimeout(() => {
+      setChanged(next);
+      clearHighlight = setTimeout(() => setChanged(new Set()), 350);
+    }, 0);
+
+    return () => {
+      clearTimeout(show);
+      if (clearHighlight) clearTimeout(clearHighlight);
+    };
+  }, [items]);
+
+  return changed;
+}
+
+function gridClass(columns: 3 | 4, mobileColumns?: 2 | 3 | 4): string {
+  const desktop = columns === 4 ? "sm:grid-cols-4" : "sm:grid-cols-3";
+  const mobile = mobileColumns ?? columns;
+
+  if (mobile === 2) return cn("grid-cols-2", desktop);
+  if (mobile === 3) return cn("grid-cols-3", desktop);
+  if (mobile === 4) return cn("grid-cols-4", desktop);
+  return columns === 4 ? "grid-cols-4" : "grid-cols-3";
+}
+
 export function PracticumQuickInfo({
   items,
   columns = 3,
-  compact = false,
+  mobileColumns,
+  wrapValues = false,
+  clampValueKeys = [],
 }: PracticumQuickInfoProps) {
-  const cardPad = compact ? "px-1 py-1" : "px-2 py-1.5";
-  const labelSize = compact
-    ? "text-[8px] leading-none lg:text-[10px]"
-    : "text-[9px] lg:text-[10px]";
-  const valueSize = compact
-    ? "text-[10px] leading-tight lg:text-xs"
-    : "text-xs";
-  const subSize = compact
-    ? "mt-0.5 truncate text-[7px] lg:text-[9px]"
-    : "mt-0.5 truncate text-[8px] lg:text-[9px]";
+  const changed = useChangedKeys(items);
+  const clampKeys = new Set(clampValueKeys);
 
   return (
     <div
       className={cn(
-        "w-full shrink-0",
-        compact ? COMPACT_GRID_CLASS[columns] : GRID_CLASS[columns],
-        compact && "max-lg:max-h-[4.5rem]",
+        "grid w-full min-w-0 gap-1.5 sm:gap-2",
+        gridClass(columns, mobileColumns),
       )}
     >
-      {items.map(({ key, label, value, valueClassName, sub, subClassName }) => (
-        <div key={key} className={cn(CARD_CLASS, cardPad)}>
-          <p className={cn(LABEL_CLASS, labelSize)}>{label}</p>
-          <p className={cn(VALUE_CLASS, valueSize, valueClassName)}>{value}</p>
-          {sub ? (
-            <p className={cn(subSize, subClassName)}>{sub}</p>
-          ) : null}
+      {items.map(({ key, label, value, valueClassName }) => (
+        <div
+          key={key}
+          className={cn(
+            wrapValues ? CARD_CLASS_WRAP : CARD_CLASS,
+            changed.has(key) && "border-foreground/25 bg-muted/50",
+          )}
+        >
+          <p className={LABEL_CLASS}>{label}</p>
+          <p
+            className={cn(
+              wrapValues ? VALUE_WRAP_CLASS : VALUE_CLASS,
+              clampKeys.has(key) && "line-clamp-2",
+              valueClassName,
+            )}
+          >
+            {value}
+          </p>
         </div>
       ))}
     </div>

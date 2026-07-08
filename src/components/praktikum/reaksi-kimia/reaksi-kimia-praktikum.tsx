@@ -29,8 +29,11 @@ import {
 } from "@/lib/reaksi-kimia-utils";
 import { PracticumShell } from "@/components/praktikum/practicum-shell";
 import { PanduanLangkah } from "@/components/praktikum/panduan-langkah";
-import { LksPanel } from "@/components/praktikum/lks-panel";
 import { PracticumQuickInfo } from "@/components/praktikum/practicum-quick-info";
+import {
+  PracticumResultStrip,
+  useValueHighlight,
+} from "@/components/praktikum/practicum-result-strip";
 import { ReaksiKimiaScene } from "./reaksi-kimia-scene";
 
 type ReaksiKimiaPraktikumProps = {
@@ -68,6 +71,9 @@ export function ReaksiKimiaPraktikum({
   const kondisiAwal = hitungKondisiAwal(jenis);
   const hasilTarget = hitungHasilReaksi(volumeA, volumeB, jenis);
   const tampilan = sudahCampur ? hasilTarget : kondisiAwal;
+  const resultHighlight = useValueHighlight(
+    `${tampilan.ph}-${tampilan.suhu}-${tampilan.status}-${sudahCampur}`,
+  );
 
   const arTombol = useMemo(
     () => getReaksiKimiaArButtonState(arAssets),
@@ -158,8 +164,8 @@ export function ReaksiKimiaPraktikum({
   );
 
   const controls = (
-    <div className="space-y-1.5 lg:space-y-3">
-      <div className="space-y-1">
+    <div className="space-y-3">
+      <div className="space-y-1.5">
         <div className="flex items-center justify-between text-xs">
           <span className="font-medium">Volume larutan A</span>
           <span className="text-muted-foreground tabular-nums">{volumeA} mL</span>
@@ -173,7 +179,7 @@ export function ReaksiKimiaPraktikum({
         />
       </div>
 
-      <div className="space-y-1">
+      <div className="space-y-1.5">
         <div className="flex items-center justify-between text-xs">
           <span className="font-medium">Volume larutan B</span>
           <span className="text-muted-foreground tabular-nums">{volumeB} mL</span>
@@ -187,15 +193,15 @@ export function ReaksiKimiaPraktikum({
         />
       </div>
 
-      <div className="space-y-1">
-        <span className="text-xs font-medium">Jenis reaksi</span>
-        <div className="grid grid-cols-1 gap-1.5 min-[420px]:grid-cols-3">
+      <div className="space-y-1.5">
+        <span className="text-xs font-medium leading-snug">Jenis reaksi</span>
+        <div className="grid grid-cols-1 gap-2 min-[420px]:grid-cols-3">
           {PILIHAN_REAKSI.map(({ id, label }) => (
             <Button
               key={id}
               type="button"
               variant={jenis === id ? "default" : "outline"}
-              className="min-h-9 text-xs"
+              className="min-h-10 text-xs"
               onClick={() => handleJenisChange(id)}
             >
               {label}
@@ -204,27 +210,20 @@ export function ReaksiKimiaPraktikum({
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-1.5 rounded-md border bg-muted/30 px-2 py-1.5 text-[10px] lg:text-[11px]">
-        <div className="text-center">
-          <p className="text-muted-foreground">pH</p>
-          <p className="font-semibold tabular-nums">{tampilan.ph.toFixed(1)}</p>
-        </div>
-        <div className="text-center">
-          <p className="text-muted-foreground">Suhu</p>
-          <p className="font-semibold tabular-nums">{tampilan.suhu.toFixed(0)}°C</p>
-        </div>
-        <div className="text-center">
-          <p className="text-muted-foreground">Status</p>
-          <p className="truncate font-semibold">{tampilan.status}</p>
-        </div>
-      </div>
+      <PracticumResultStrip
+        label="pH"
+        value={tampilan.ph.toFixed(1)}
+        detail={`Suhu ${tampilan.suhu.toFixed(0)}°C`}
+        status={tampilan.status}
+        highlight={resultHighlight}
+      />
 
-      <div className="grid grid-cols-2 gap-2">
-        <Button className="min-h-10 lg:min-h-11" onClick={handleCampurkan}>
+      <div className="grid grid-cols-2 gap-2.5">
+        <Button className="min-h-12" onClick={handleCampurkan}>
           Campurkan
         </Button>
         <Button
-          className="min-h-10 lg:min-h-11"
+          className="min-h-12"
           variant="outline"
           onClick={handleReset}
         >
@@ -235,10 +234,10 @@ export function ReaksiKimiaPraktikum({
   );
 
   const arButton = (
-    <div className="space-y-0.5 pb-[calc(4.5rem+env(safe-area-inset-bottom,0px))] lg:pb-0">
+    <div className="space-y-1">
       <Button
         className={cn(
-          "flex h-11 min-h-11 w-full items-center justify-center gap-2 border-2 px-4 py-0 text-sm leading-normal font-medium lg:h-[52px] lg:min-h-[52px]",
+          "flex min-h-[52px] w-full items-center justify-center gap-2 border-2 px-4 py-0 text-sm leading-normal font-medium",
           arTombolAktif
             ? "border-primary bg-primary text-primary-foreground hover:bg-primary/90"
             : "border-primary/50 bg-primary/5 text-foreground hover:bg-primary/10",
@@ -263,6 +262,7 @@ export function ReaksiKimiaPraktikum({
   return (
     <PracticumShell
       title={modul.judul}
+      moduleId={modul.id}
       badge={badge}
       scene={scene}
       quickInfo={
@@ -289,14 +289,11 @@ export function ReaksiKimiaPraktikum({
         />
       }
       mobileQuickInfoBelowScene
-      mobileSheetPadding="large"
       controls={controls}
       guide={
         <PanduanLangkah langkah={langkah} arAktif={arAktif} reaksiKimia />
       }
-      lks={<LksPanel moduleId={modul.id} />}
       arButton={arButton}
-      sceneClassName="max-lg:min-h-[55svh] max-lg:max-h-[65svh] max-lg:flex-none max-lg:shrink-0 lg:min-h-0 lg:flex-1"
     />
   );
 }

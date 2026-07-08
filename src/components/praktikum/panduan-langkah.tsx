@@ -1,14 +1,15 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import Link from "next/link";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import {
   ChevronLeft,
   ChevronRight,
   CheckCircle2,
+  ClipboardList,
 } from "lucide-react";
 import type { LangkahPraktikum } from "@/db/schema";
+import { usePracticumPanelOptional } from "@/components/praktikum/practicum-panel-context";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 
@@ -49,6 +50,36 @@ export const INSTRUKSI_REAKSI_KIMIA_3D = {
     "Atur volume larutan A dan B, pilih jenis reaksi, lalu tekan Campurkan dan amati perubahan warna, suhu, pH, serta gelembung.",
 } as const;
 
+export const INSTRUKSI_ARCHIMEDES_3D = {
+  judul: "Simulasi Hukum Archimedes",
+  deskripsi:
+    "Atur massa dan volume benda, pilih jenis cairan, lalu tekan Masukkan Benda dan bandingkan gaya berat (W) dengan gaya apung (Fₐ).",
+} as const;
+
+export const INSTRUKSI_CAHAYA_OPTIK_3D = {
+  judul: "Simulasi Pemantulan & Pembiasan",
+  deskripsi:
+    "Atur sudut datang dan mode eksperimen, pilih medium pada pembiasan, lalu tekan Pancarkan Cahaya dan bandingkan sudut pantul atau bias terhadap garis normal.",
+} as const;
+
+export const INSTRUKSI_BANDUL_SEDERHANA_3D = {
+  judul: "Simulasi Getaran Bandul",
+  deskripsi:
+    "Atur panjang tali, massa, dan sudut awal, pilih lingkungan gravitasi, lalu tekan Mulai Ayunan dan amati periode teori bandul.",
+} as const;
+
+export const INSTRUKSI_HOOKE_SPRING_3D = {
+  judul: "Simulasi Elastisitas Pegas",
+  deskripsi:
+    "Atur konstanta pegas dan massa beban, pilih mode Beban Statis atau Getaran Pegas, lalu amati hubungan F = kx dan periode T = 2π√(m/k).",
+} as const;
+
+export const INSTRUKSI_THERMAL_CHANGE_3D = {
+  judul: "Simulasi Kalor & Suhu",
+  deskripsi:
+    "Atur massa, daya pemanas, dan jenis zat, lalu jalankan pemanasan dan amati hubungan Q = mcΔT pada grafik suhu terhadap waktu.",
+} as const;
+
 export const INSTRUKSI_AR = {
   judul: "Arahkan Kamera ke Meja",
   deskripsi:
@@ -68,7 +99,102 @@ export type PanduanLangkahProps = {
   tataSurya?: boolean;
   jatuhBebas?: boolean;
   reaksiKimia?: boolean;
+  archimedes?: boolean;
+  cahayaOptik?: boolean;
+  bandulSederhana?: boolean;
+  hookeSpring?: boolean;
+  thermalChange?: boolean;
 };
+
+function PanduanNavFooter({
+  idx,
+  total,
+  onPrev,
+  onNext,
+  onFinish,
+}: {
+  idx: number;
+  total: number;
+  onPrev: () => void;
+  onNext: () => void;
+  onFinish: () => void;
+}) {
+  return (
+    <div className="flex items-center justify-between gap-2">
+      <Button
+        variant="outline"
+        className="min-h-11 flex-1"
+        onClick={onPrev}
+        disabled={idx === 0}
+      >
+        <ChevronLeft className="size-4" />
+        Sebelumnya
+      </Button>
+      {idx < total - 1 ? (
+        <Button className="min-h-11 flex-1" onClick={onNext}>
+          Selanjutnya
+          <ChevronRight className="size-4" />
+        </Button>
+      ) : (
+        <Button className="min-h-11 flex-1" onClick={onFinish}>
+          <CheckCircle2 className="size-4" />
+          Selesai
+        </Button>
+      )}
+    </div>
+  );
+}
+
+function PanduanSelesaiView({
+  onBackToSimulation,
+  onOpenLKS,
+  onRestartGuide,
+  lksAvailable,
+}: {
+  onBackToSimulation: () => void;
+  onOpenLKS: () => void;
+  onRestartGuide: () => void;
+  lksAvailable: boolean;
+}) {
+  return (
+    <div className="flex flex-col items-center gap-5 py-4 text-center sm:py-6">
+      <CheckCircle2 className="size-10 text-primary" aria-hidden />
+      <div className="max-w-sm space-y-2">
+        <h2 className="text-2xl font-semibold leading-snug">Panduan Selesai</h2>
+        <p className="text-sm leading-relaxed text-muted-foreground">
+          Kamu sudah membaca seluruh langkah panduan. Sekarang lakukan
+          eksperimen dan catat hasil pengamatanmu pada LKS.
+        </p>
+      </div>
+      <div className="flex w-full max-w-sm flex-col gap-2.5">
+        <Button
+          type="button"
+          variant="outline"
+          className="min-h-12 w-full"
+          onClick={onBackToSimulation}
+        >
+          Kembali ke Simulasi
+        </Button>
+        <Button
+          type="button"
+          className="min-h-12 w-full gap-2"
+          disabled={!lksAvailable}
+          onClick={onOpenLKS}
+        >
+          <ClipboardList className="size-4 shrink-0" aria-hidden />
+          {lksAvailable ? "Kerjakan LKS" : "LKS belum tersedia"}
+        </Button>
+      </div>
+      <button
+        type="button"
+        className="min-h-11 text-sm text-muted-foreground underline-offset-4 hover:underline"
+        onClick={onRestartGuide}
+      >
+        Ulangi panduan
+      </button>
+    </div>
+  );
+}
 
 export function PanduanLangkah({
   langkah,
@@ -78,10 +204,17 @@ export function PanduanLangkah({
   tataSurya = false,
   jatuhBebas = false,
   reaksiKimia = false,
+  archimedes = false,
+  cahayaOptik = false,
+  bandulSederhana = false,
+  hookeSpring = false,
+  thermalChange = false,
 }: PanduanLangkahProps) {
+  const panel = usePracticumPanelOptional();
   const total = langkah.length;
   const [idx, setIdx] = useState(0);
-  const [selesai, setSelesai] = useState(false);
+  const [localSelesai, setLocalSelesai] = useState(false);
+  const selesai = panel?.guideComplete ?? localSelesai;
 
   const langkahAktif = langkah[idx];
   const persen = useMemo(
@@ -98,14 +231,63 @@ export function PanduanLangkah({
       if (tataSurya) return INSTRUKSI_TATA_SURYA_3D;
       if (jatuhBebas) return INSTRUKSI_JATUH_BEBAS_3D;
       if (reaksiKimia) return INSTRUKSI_REAKSI_KIMIA_3D;
+      if (archimedes) return INSTRUKSI_ARCHIMEDES_3D;
+      if (cahayaOptik) return INSTRUKSI_CAHAYA_OPTIK_3D;
+      if (bandulSederhana) return INSTRUKSI_BANDUL_SEDERHANA_3D;
+      if (hookeSpring) return INSTRUKSI_HOOKE_SPRING_3D;
+      if (thermalChange) return INSTRUKSI_THERMAL_CHANGE_3D;
       return INSTRUKSI_3D;
     }
     return { judul: langkahAktif.judul, deskripsi: langkahAktif.instruksi };
-  }, [langkahAktif, arAktif, newton, rangkaian, tataSurya, jatuhBebas, reaksiKimia]);
+  }, [langkahAktif, arAktif, newton, rangkaian, tataSurya, jatuhBebas, reaksiKimia, archimedes, cahayaOptik, bandulSederhana, hookeSpring, thermalChange]);
+
+  const goPrev = useCallback(() => setIdx((i) => Math.max(0, i - 1)), []);
+  const goNext = useCallback(
+    () => setIdx((i) => Math.min(total - 1, i + 1)),
+    [total],
+  );
+  const goFinish = useCallback(() => {
+    if (panel) {
+      panel.setGuideComplete(true);
+    } else {
+      setLocalSelesai(true);
+    }
+    toast.success("Panduan selesai dibaca.");
+  }, [panel]);
+
+  const restartGuide = useCallback(() => {
+    panel?.setGuideComplete(false);
+    setLocalSelesai(false);
+    setIdx(0);
+    panel?.scrollToTop();
+  }, [panel]);
+
+  useEffect(() => {
+    if (!panel || selesai || total === 0) {
+      panel?.setFooter(null);
+      return;
+    }
+
+    panel.setFooter(
+      <PanduanNavFooter
+        idx={idx}
+        total={total}
+        onPrev={goPrev}
+        onNext={goNext}
+        onFinish={goFinish}
+      />,
+    );
+
+    return () => panel.setFooter(null);
+  }, [panel, idx, total, selesai, goPrev, goNext, goFinish]);
+
+  useEffect(() => {
+    panel?.scrollToTop();
+  }, [panel, idx]);
 
   if (total === 0) {
     return (
-      <p className="text-sm text-muted-foreground">
+      <p className="text-sm leading-relaxed text-muted-foreground">
         Belum ada panduan langkah untuk modul ini.
       </p>
     );
@@ -113,74 +295,67 @@ export function PanduanLangkah({
 
   if (selesai) {
     return (
-      <div className="flex h-full flex-col items-center justify-center gap-4 text-center">
-        <CheckCircle2 className="size-14 text-primary" />
-        <div>
-          <h2 className="text-xl font-semibold">Praktikum Selesai!</h2>
-          <p className="text-muted-foreground">
-            Kamu telah menyelesaikan seluruh langkah. Jangan lupa isi LKS-mu ya.
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            onClick={() => {
-              setSelesai(false);
-              setIdx(0);
-            }}
-          >
-            Ulangi
-          </Button>
-          <Button render={<Link href="/siswa" />} nativeButton={false}>
-            Kembali ke Beranda
-          </Button>
-        </div>
-      </div>
+      <PanduanSelesaiView
+        onBackToSimulation={() => {
+          panel?.backToSimulation();
+          setLocalSelesai(false);
+        }}
+        onOpenLKS={() => panel?.openLKS()}
+        onRestartGuide={restartGuide}
+        lksAvailable={panel?.lksAvailable ?? false}
+      />
     );
   }
 
+  const navFooter = (
+    <PanduanNavFooter
+      idx={idx}
+      total={total}
+      onPrev={goPrev}
+      onNext={goNext}
+      onFinish={goFinish}
+    />
+  );
+
   return (
-    <div className="flex h-full flex-col">
-      <div className="mb-4">
-        <div className="mb-1 flex items-center justify-between text-sm">
-          <span className="font-medium text-muted-foreground">
-            Langkah {idx + 1} dari {total}
+    <div>
+      <div className="mb-4 space-y-3">
+        <div className="flex items-center justify-between gap-2">
+          <h3 className="text-sm font-semibold leading-snug">
+            Panduan Praktikum
+          </h3>
+          <span className="shrink-0 text-xs font-medium tabular-nums text-muted-foreground">
+            {idx + 1}/{total}
           </span>
-          <span className="text-muted-foreground">{persen}%</span>
         </div>
-        <Progress value={persen} />
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between text-xs text-muted-foreground">
+            <span>
+              Langkah {idx + 1} dari {total}
+            </span>
+            <span className="tabular-nums">{persen}%</span>
+          </div>
+          <Progress value={persen} className="h-1.5" />
+        </div>
       </div>
 
-      <div className="flex-1">
+      <div className="space-y-3">
+        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          Langkah {idx + 1}
+        </p>
         {tampil?.judul ? (
-          <h2 className="mb-2 text-lg font-semibold">{tampil.judul}</h2>
+          <h2 className="text-base font-semibold leading-snug sm:text-lg">
+            {tampil.judul}
+          </h2>
         ) : null}
-        <p className="leading-relaxed text-foreground/90">{tampil?.deskripsi}</p>
+        <p className="text-sm leading-[1.55] text-foreground/90">
+          {tampil?.deskripsi}
+        </p>
       </div>
 
-      <div className="mt-6 flex items-center justify-between gap-2">
-        <Button
-          variant="outline"
-          onClick={() => setIdx((i) => Math.max(0, i - 1))}
-          disabled={idx === 0}
-        >
-          <ChevronLeft /> Sebelumnya
-        </Button>
-        {idx < total - 1 ? (
-          <Button onClick={() => setIdx((i) => Math.min(total - 1, i + 1))}>
-            Selanjutnya <ChevronRight />
-          </Button>
-        ) : (
-          <Button
-            onClick={() => {
-              setSelesai(true);
-              toast.success("Praktikum selesai! Kerja bagus. 🎉");
-            }}
-          >
-            <CheckCircle2 /> Selesaikan
-          </Button>
-        )}
-      </div>
+      {!panel ? (
+        <div className="mt-6 border-t pt-4 lg:mt-8">{navFooter}</div>
+      ) : null}
     </div>
   );
 }

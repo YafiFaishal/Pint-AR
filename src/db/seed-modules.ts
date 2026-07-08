@@ -32,6 +32,41 @@ const MODUL_BARU = [
     instruksi:
       "Simulasi pencampuran bahan kimia sedang dikembangkan. Pantau pembaruan berikutnya.",
   },
+  {
+    judul: "Hukum Archimedes",
+    deskripsi:
+      "Uji pengaruh massa, volume, dan jenis cairan terhadap kondisi terapung, melayang, atau tenggelam.",
+    instruksi:
+      "Simulasi Hukum Archimedes sedang dikembangkan. Pantau pembaruan berikutnya.",
+  },
+  {
+    judul: "Pemantulan dan Pembiasan Cahaya",
+    deskripsi:
+      "Amati arah cahaya saat dipantulkan dan dibiaskan pada medium yang berbeda.",
+    instruksi:
+      "Simulasi pemantulan dan pembiasan cahaya sedang dikembangkan. Pantau pembaruan berikutnya.",
+  },
+  {
+    judul: "Getaran Bandul Sederhana",
+    deskripsi:
+      "Amati pengaruh panjang tali, gravitasi, dan massa terhadap periode ayunan bandul.",
+    instruksi:
+      "Simulasi getaran bandul sederhana sedang dikembangkan. Pantau pembaruan berikutnya.",
+  },
+  {
+    judul: "Hukum Hooke dan Elastisitas Pegas",
+    deskripsi:
+      "Amati hubungan gaya, pertambahan panjang, konstanta pegas, dan getaran massa–pegas.",
+    instruksi:
+      "Simulasi Hukum Hooke dan elastisitas pegas sedang dikembangkan. Pantau pembaruan berikutnya.",
+  },
+  {
+    judul: "Kalor dan Perubahan Suhu",
+    deskripsi:
+      "Amati pengaruh massa, kalor jenis, dan energi pemanas terhadap perubahan suhu suatu zat.",
+    instruksi:
+      "Simulasi kalor dan perubahan suhu sedang dikembangkan. Pantau pembaruan berikutnya.",
+  },
 ] as const;
 
 async function main() {

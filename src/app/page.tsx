@@ -1,63 +1,62 @@
 import Link from "next/link";
+import { AuthShell, AuthNavLink } from "@/components/auth/auth-shell";
 import { Button } from "@/components/ui/button";
+
+const VALUE_POINTS = [
+  "Tanpa instal aplikasi",
+  "Simulasi 3D dan AR",
+  "LKS terintegrasi",
+] as const;
 
 export default function Home() {
   return (
-    <div className="flex flex-1 flex-col">
-      <header className="flex items-center justify-between px-6 py-4 sm:px-10">
-        <span className="text-lg font-bold tracking-tight">
-          Pint<span className="text-primary">AR</span>
-        </span>
-        <div className="flex items-center gap-2">
-          <Button
-            render={<Link href="/masuk" />}
-            nativeButton={false}
-            variant="ghost"
-            size="sm"
-          >
-            Masuk
-          </Button>
+    <AuthShell
+      variant="landing"
+      headerRight={
+        <>
+          <AuthNavLink href="/masuk">Masuk</AuthNavLink>
+          <AuthNavLink href="/daftar">Daftar</AuthNavLink>
+        </>
+      }
+      footer="PintAR — Praktikum sains interaktif berbasis web."
+    >
+      <div className="flex w-full flex-col items-center gap-8 text-center sm:gap-10">
+        <p className="text-xs font-medium uppercase tracking-wider leading-snug text-muted-foreground">
+          Praktikum Interaktif Augmented Reality
+        </p>
+
+        <div className="space-y-4">
+          <h1 className="text-[1.75rem] font-bold leading-[1.15] tracking-tight sm:text-3xl lg:text-4xl">
+            Laboratorium sains langsung di meja belajarmu
+          </h1>
+          <p className="mx-auto max-w-md text-sm leading-[1.55] text-muted-foreground sm:text-base">
+            Proyeksikan alat lab 3D lewat kamera HP, ikuti panduan langkah,
+            dan isi LKS dalam satu web app.
+          </p>
+        </div>
+
+        <div className="flex w-full max-w-sm flex-col gap-3 pt-1 sm:max-w-none sm:flex-row sm:justify-center sm:gap-4">
           <Button
             render={<Link href="/daftar" />}
             nativeButton={false}
-            size="sm"
+            className="min-h-[52px] w-full sm:w-auto"
           >
-            Daftar
-          </Button>
-        </div>
-      </header>
-
-      <main className="flex flex-1 flex-col items-center justify-center gap-8 px-6 py-20 text-center">
-        <div className="inline-flex items-center rounded-full border bg-muted px-4 py-1.5 text-sm text-muted-foreground">
-          Praktikum Interaktif Augmented Reality
-        </div>
-        <h1 className="max-w-3xl text-4xl font-bold leading-tight tracking-tight sm:text-6xl">
-          Laboratorium sains{" "}
-          <span className="text-primary">langsung di meja belajarmu</span>
-        </h1>
-        <p className="max-w-xl text-lg text-muted-foreground">
-          Proyeksikan alat lab 3D ke atas meja lewat kamera HP, ikuti panduan
-          langkah, dan isi Lembar Kerja Siswa di layar yang sama. Tanpa instal
-          aplikasi, cukup buka browser.
-        </p>
-        <div className="flex flex-col gap-3 sm:flex-row">
-          <Button render={<Link href="/daftar" />} nativeButton={false} size="lg">
             Mulai Sekarang
           </Button>
           <Button
             render={<Link href="/masuk" />}
             nativeButton={false}
-            size="lg"
             variant="outline"
+            className="min-h-[52px] w-full sm:w-auto"
           >
-            Sudah punya akun
+            Masuk ke akun
           </Button>
         </div>
-      </main>
 
-      <footer className="border-t px-6 py-6 text-center text-sm text-muted-foreground">
-        PintAR — Belajar sains tanpa batas ruang & alat.
-      </footer>
-    </div>
+        <p className="text-xs leading-relaxed text-muted-foreground">
+          {VALUE_POINTS.join(" · ")}
+        </p>
+      </div>
+    </AuthShell>
   );
 }
