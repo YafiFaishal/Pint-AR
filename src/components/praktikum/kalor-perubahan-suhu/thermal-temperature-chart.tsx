@@ -53,11 +53,11 @@ export function ThermalTemperatureChart({
     const pathB =
       mode === "comparison"
         ? points
-            .filter((p) => p.tempB !== undefined)
-            .map((p, i) =>
-              `${i === 0 ? "M" : "L"}${toX(p.timeS).toFixed(2)},${toY(p.tempB!).toFixed(2)}`,
-            )
-            .join(" ")
+          .filter((p) => p.tempB !== undefined)
+          .map((p, i) =>
+            `${i === 0 ? "M" : "L"}${toX(p.timeS).toFixed(2)},${toY(p.tempB!).toFixed(2)}`,
+          )
+          .join(" ")
         : "";
 
     return { pathA, pathB, minT, maxT, maxTime };

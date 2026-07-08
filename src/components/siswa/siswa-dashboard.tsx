@@ -73,7 +73,7 @@ function arInfoPesan(): string {
 }
 
 function subscribeClientOnly() {
-  return () => {};
+  return () => { };
 }
 
 function useLastModuleId() {

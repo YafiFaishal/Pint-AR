@@ -32,17 +32,17 @@ const PILIHAN_PERAN: {
   judul: string;
   deskripsi: string;
 }[] = [
-  {
-    value: "siswa",
-    judul: "Siswa",
-    deskripsi: "Mengikuti praktikum dan mengisi LKS",
-  },
-  {
-    value: "guru",
-    judul: "Guru",
-    deskripsi: "Memantau progres dan memberi nilai",
-  },
-];
+    {
+      value: "siswa",
+      judul: "Siswa",
+      deskripsi: "Mengikuti praktikum dan mengisi LKS",
+    },
+    {
+      value: "guru",
+      judul: "Guru",
+      deskripsi: "Memantau progres dan memberi nilai",
+    },
+  ];
 
 export function RegisterForm() {
   const router = useRouter();
