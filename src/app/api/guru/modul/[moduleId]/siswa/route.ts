@@ -44,7 +44,7 @@ export async function GET(
       email: r.email,
       dijawab,
       totalSoal,
-      status: selesai ? "Selesai" : "Sedang Praktikum",
+      status: selesai ? "Selesai" : "Sedang dipelajari",
       sudahDinilai: dijawab > 0 && dinilaiCount >= dijawab,
     };
   });

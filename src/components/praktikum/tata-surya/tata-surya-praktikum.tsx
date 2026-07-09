@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Box } from "lucide-react";
+import { SimulationArActionButton } from "@/components/praktikum/simulation-action-button";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
@@ -13,7 +13,6 @@ import {
   type ModelViewerHandle,
 } from "@/components/model-viewer";
 import type { LangkahPraktikum, Modul } from "@/db/schema";
-import { cn } from "@/lib/utils";
 import {
   hitungPeriodeRelatif,
   JARAK_ORBIT_MAX,
@@ -213,29 +212,10 @@ export function TataSuryaPraktikum({
   );
 
   const arButton = (
-    <div className="space-y-1">
-      <Button
-        className={cn(
-          "flex h-[52px] min-h-[52px] w-full items-center justify-center gap-2 border-2 px-4 py-0 text-sm leading-normal font-medium",
-          arTombolAktif
-            ? "border-primary bg-primary text-primary-foreground hover:bg-primary/90"
-            : "border-primary/50 bg-primary/5 text-foreground hover:bg-primary/10",
-        )}
-        variant="outline"
-        onClick={handleLihatDiMeja}
-        aria-label="Lihat di Meja (AR)"
-        aria-disabled={!arTombolAktif}
-      >
-        <Box className="size-4 shrink-0" aria-hidden />
-        <span className="lg:hidden">Lihat AR</span>
-        <span className="hidden lg:inline">Lihat di Meja (AR)</span>
-      </Button>
-      {arTombol.petunjuk ? (
-        <p className="px-0.5 text-[10px] leading-snug text-muted-foreground lg:text-[11px]">
-          {arTombol.petunjuk}
-        </p>
-      ) : null}
-    </div>
+    <SimulationArActionButton
+      onClick={handleLihatDiMeja}
+      active={arTombolAktif}
+    />
   );
 
   return (
@@ -267,6 +247,7 @@ export function TataSuryaPraktikum({
         />
       }
       arButton={arButton}
+      arHint={arTombol.petunjuk}
     />
   );
 }

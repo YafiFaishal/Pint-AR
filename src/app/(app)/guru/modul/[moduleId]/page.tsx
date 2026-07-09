@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { eq } from "drizzle-orm";
 import { db, modul } from "@/db";
 import { requireUser } from "@/lib/session";
+import { getKategoriModul } from "@/lib/siswa-modul-utils";
 import { ModulDetailView } from "@/components/guru/modul-detail-view";
 
 export default async function GuruModulPage({
@@ -17,5 +18,11 @@ export default async function GuruModulPage({
     notFound();
   }
 
-  return <ModulDetailView moduleId={m.id} judul={m.judul} />;
+  return (
+    <ModulDetailView
+      moduleId={m.id}
+      judul={m.judul}
+      kategori={getKategoriModul(m)}
+    />
+  );
 }

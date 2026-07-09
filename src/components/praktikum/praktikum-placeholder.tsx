@@ -15,7 +15,7 @@ export function PraktikumPlaceholder({
         <FlaskConical className="size-8" aria-hidden />
       </div>
       <div className="max-w-sm space-y-1">
-        <h2 className="text-lg font-semibold">Praktikum sedang disiapkan</h2>
+        <h2 className="text-lg font-semibold">Simulasi sedang disiapkan</h2>
         <p className="text-sm leading-relaxed text-muted-foreground">
           {deskripsi ??
             `Simulasi interaktif untuk modul "${judul}" akan segera hadir. Kamu tetap bisa membaca panduan singkat di panel bawah.`}

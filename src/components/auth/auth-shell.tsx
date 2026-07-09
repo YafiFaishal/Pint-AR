@@ -1,25 +1,17 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-
-function AuthLogo() {
-  return (
-    <Link
-      href="/"
-      className="rounded-sm text-lg font-bold tracking-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-    >
-      Pint<span className="text-primary">AR</span>
-    </Link>
-  );
-}
+import { PintARBrand } from "@/components/brand/pintar-brand";
 
 export function AuthNavLink({
   href,
   children,
   active = false,
+  className,
 }: {
   href: string;
   children: React.ReactNode;
   active?: boolean;
+  className?: string;
 }) {
   return (
     <Link
@@ -30,6 +22,7 @@ export function AuthNavLink({
         active
           ? "text-foreground"
           : "text-muted-foreground hover:text-foreground",
+        className,
       )}
     >
       {children}
@@ -42,10 +35,11 @@ type AuthShellProps = {
   variant?: "landing" | "login" | "register";
   headerRight?: React.ReactNode;
   footer?: React.ReactNode;
+  rootClassName?: string;
 };
 
 const MAIN_MAX_WIDTH = {
-  landing: "max-w-xl",
+  landing: "max-w-6xl",
   login: "max-w-[680px]",
   register: "max-w-[720px]",
 } as const;
@@ -55,13 +49,23 @@ export function AuthShell({
   variant = "login",
   headerRight,
   footer,
+  rootClassName,
 }: AuthShellProps) {
   const isLanding = variant === "landing";
 
   return (
-    <div className="flex min-h-dvh flex-col">
-      <header className="flex h-20 shrink-0 items-center justify-between border-b px-6 pt-[env(safe-area-inset-top,0px)] sm:px-8">
-        <AuthLogo />
+    <div
+      className={cn("flex min-h-dvh flex-col scientific-bg", rootClassName)}
+    >
+      <header
+        className={cn(
+          "flex shrink-0 items-center justify-between border-b border-border/80 bg-card/70 pt-[env(safe-area-inset-top,0px)] backdrop-blur-sm",
+          isLanding
+            ? "landing-header h-[4.75rem] px-5 sm:px-6"
+            : "h-20 px-6 sm:px-8",
+        )}
+      >
+        <PintARBrand priority={isLanding} />
         {headerRight ? (
           <div className="flex items-center gap-1 sm:gap-2">{headerRight}</div>
         ) : null}
@@ -72,7 +76,7 @@ export function AuthShell({
           "mx-auto flex w-full flex-1 flex-col px-6 sm:px-8",
           MAIN_MAX_WIDTH[variant],
           isLanding
-            ? "items-center justify-start pt-12 pb-[calc(120px+env(safe-area-inset-bottom,0px))] sm:pt-16"
+            ? "justify-start pt-8 pb-[calc(96px+env(safe-area-inset-bottom,0px))] sm:pt-10 lg:pt-12"
             : "justify-start pt-10 pb-[calc(120px+env(safe-area-inset-bottom,0px))] sm:pt-12",
         )}
         style={{ minHeight: "calc(100dvh - 80px)" }}

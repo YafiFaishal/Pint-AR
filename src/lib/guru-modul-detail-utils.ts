@@ -17,7 +17,7 @@ export type RekapSiswaRow = {
 
 export type StatusSiswaDetail =
   | "Belum mulai"
-  | "Sedang mengerjakan"
+  | "Sedang dipelajari"
   | "Selesai"
   | "Perlu dinilai"
   | "Sudah dinilai";
@@ -74,7 +74,7 @@ export function deriveStatusSiswa(s: SiswaModulRow): StatusSiswaDetail {
   if (s.dijawab === 0) return "Belum mulai";
   if (s.sudahDinilai) return "Sudah dinilai";
   if (selesai) return "Perlu dinilai";
-  if (s.dijawab > 0) return "Sedang mengerjakan";
+  if (s.dijawab > 0) return "Sedang dipelajari";
   return "Belum mulai";
 }
 
@@ -86,8 +86,8 @@ export function statusBadgesSiswa(
       return ["Selesai", "Sudah dinilai"];
     case "Perlu dinilai":
       return ["Selesai", "Perlu dinilai"];
-    case "Sedang mengerjakan":
-      return ["Sedang mengerjakan"];
+    case "Sedang dipelajari":
+      return ["Sedang dipelajari"];
     case "Selesai":
       return ["Selesai"];
     default:
@@ -102,7 +102,7 @@ export function tombolAksiSiswa(status: StatusSiswaDetail): {
   switch (status) {
     case "Belum mulai":
       return { label: "Belum ada progres", disabled: true };
-    case "Sedang mengerjakan":
+    case "Sedang dipelajari":
       return { label: "Lihat Progres", disabled: false };
     case "Perlu dinilai":
       return { label: "Periksa LKS", disabled: false };
@@ -139,7 +139,7 @@ export function cocokFilterSiswa(
   if (filter === "Perlu dinilai") return st === "Perlu dinilai";
   if (filter === "Selesai")
     return st === "Selesai" || st === "Perlu dinilai" || st === "Sudah dinilai";
-  if (filter === "Mengerjakan") return st === "Sedang mengerjakan";
+  if (filter === "Mengerjakan") return st === "Sedang dipelajari";
   if (filter === "Sudah dinilai") return st === "Sudah dinilai";
   return true;
 }

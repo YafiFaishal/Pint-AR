@@ -23,6 +23,8 @@ import {
   tombolAksiSiswa,
 } from "@/lib/guru-modul-detail-utils";
 import { cn } from "@/lib/utils";
+import { ModuleIconImage } from "@/components/module-icon-image";
+import type { KategoriModul } from "@/lib/siswa-modul-utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -67,9 +69,7 @@ function FilterChips<T extends string>({
           onClick={() => onChange(opsi)}
           className={cn(
             "shrink-0 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors min-h-[44px] sm:min-h-0 sm:py-1",
-            value === opsi
-              ? "border-foreground bg-foreground text-background"
-              : "border-border bg-background text-muted-foreground hover:text-foreground",
+            value === opsi ? "filter-chip-active" : "filter-chip-inactive",
           )}
         >
           {opsi}
@@ -107,7 +107,7 @@ function SegmentedTabs({
           className={cn(
             "min-h-11 rounded-lg text-sm font-medium transition-colors sm:min-h-12",
             active === id
-              ? "bg-foreground text-background shadow-sm"
+              ? "bg-primary text-primary-foreground shadow-sm"
               : "text-muted-foreground hover:text-foreground",
           )}
         >
@@ -118,15 +118,20 @@ function SegmentedTabs({
   );
 }
 
-function StatusBadge({ status }: { status: StatusSiswaDetail | string }) {
-  const primary =
-    status === "Perlu dinilai" ||
-    status === "Sudah dinilai" ||
-    status === "Selesai";
+function DetailStatusBadge({ status }: { status: StatusSiswaDetail | string }) {
+  const cls =
+    status === "Perlu dinilai"
+      ? "status-badge-warning"
+      : status === "Sudah dinilai" || status === "Selesai"
+        ? "status-badge-success"
+        : status === "Mengerjakan" || status === "Sedang dipelajari"
+          ? "status-badge-info"
+          : "status-badge-neutral";
+
   return (
     <Badge
-      variant={primary ? "default" : "outline"}
-      className="text-[10px] font-medium"
+      variant="outline"
+      className={cn("text-[10px] font-medium", cls)}
     >
       {status}
     </Badge>
@@ -171,7 +176,7 @@ function SiswaMobileCard({
           aria-label={`Progres ${persen} persen`}
         >
           <div
-            className="h-full bg-foreground transition-[width] duration-300"
+            className="h-full bg-primary transition-[width] duration-300"
             style={{ width: `${persen}%` }}
           />
         </div>
@@ -182,7 +187,7 @@ function SiswaMobileCard({
 
       <div className="mt-3 flex flex-wrap gap-1.5">
         {badges.map((b) => (
-          <StatusBadge key={b} status={b} />
+          <DetailStatusBadge key={b} status={b} />
         ))}
       </div>
 
@@ -259,7 +264,7 @@ function SiswaDesktopTable({
                 <TableCell>
                   <div className="flex flex-wrap gap-1">
                     {statusBadgesSiswa(status).map((b) => (
-                      <StatusBadge key={b} status={b} />
+                      <DetailStatusBadge key={b} status={b} />
                     ))}
                   </div>
                 </TableCell>
@@ -324,7 +329,7 @@ function RekapMobileCard({
         ) : null}
         <div className="flex items-center justify-between gap-2">
           <span className="text-muted-foreground">Status</span>
-          <StatusBadge
+          <DetailStatusBadge
             status={dinilai ? "Sudah dinilai" : "Belum dinilai"}
           />
         </div>
@@ -378,6 +383,7 @@ export function ModulDetailView({
 }: {
   moduleId: string;
   judul: string;
+  kategori: KategoriModul;
 }) {
   const [tab, setTab] = useState<TabModulDetail>("siswa");
   const [siswa, setSiswa] = useState<SiswaModulRow[] | null>(null);
@@ -487,17 +493,23 @@ export function ModulDetailView({
   const jumlahBelum = (rekap ?? []).length - jumlahDinilai;
 
   return (
-    <main className="mx-auto w-full max-w-5xl px-5 pb-[calc(6rem+env(safe-area-inset-bottom,0px))] pt-4 sm:px-6 sm:pt-6 lg:max-w-6xl">
-      <div className="mb-4 flex gap-2 sm:mb-5">
+    <main className="page-container lg:max-w-6xl">
+      <div className="mb-4 flex gap-3 sm:mb-5">
         <Button
           render={<Link href="/guru" />}
           nativeButton={false}
           variant="ghost"
-          className="size-11 shrink-0"
+          className="size-11 shrink-0 self-start"
           aria-label="Kembali ke Dasbor Guru"
         >
           <ArrowLeft className="size-5" />
         </Button>
+        <ModuleIconImage
+          judul={judul}
+          moduleId={moduleId}
+          size="md"
+          className="shrink-0 self-start"
+        />
         <div className="min-w-0 flex-1">
           <h1 className="line-clamp-2 text-xl font-bold tracking-tight sm:text-2xl">
             {judul}
@@ -604,7 +616,7 @@ export function ModulDetailView({
               ) : (
                 <EmptyState
                   title="Belum ada siswa aktif"
-                  description="Belum ada siswa yang memulai modul ini. Data progres akan muncul setelah siswa membuka praktikum."
+                  description="Belum ada siswa yang memulai modul ini. Data progres akan muncul setelah siswa membuka simulasi."
                 />
               )}
             </>
@@ -733,7 +745,7 @@ export function ModulDetailView({
                               {formatPoinMentah(r.totalSkor, totalSoal) ?? "—"}
                             </TableCell>
                             <TableCell>
-                              <StatusBadge
+                              <DetailStatusBadge
                                 status={
                                   r.status === "Sudah Dinilai"
                                     ? "Sudah dinilai"

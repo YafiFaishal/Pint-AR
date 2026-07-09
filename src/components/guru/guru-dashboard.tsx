@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { ArrowRight, ChevronRight } from "lucide-react";
+import { ArrowRight, ChevronRight, ClipboardCheck, Layers, Users, UserCheck } from "lucide-react";
 import type {
   GuruDashboardData,
   ModulGuruDashboardItem,
@@ -10,7 +10,6 @@ import type {
 import {
   cocokFilterGuru,
   ringkasanStatusModul,
-  statusBadgeVariant,
   type FilterModulGuru,
 } from "@/lib/guru-modul-utils";
 import { cn } from "@/lib/utils";
@@ -23,6 +22,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { UI_COPY } from "@/lib/branding";
+import { ModuleIconImage } from "@/components/module-icon-image";
+import { GuruModulStatusBadge } from "@/components/status-badge";
 
 const FILTER_OPSI: FilterModulGuru[] = [
   "Semua",
@@ -41,25 +43,19 @@ function RingkasanGrid({
   ringkasan: GuruDashboardData["ringkasan"];
 }) {
   const items = [
-    { label: "Total modul", value: ringkasan.totalModul },
-    { label: "Siswa aktif", value: ringkasan.siswaAktif },
-    { label: "Menunggu dinilai", value: ringkasan.menungguDinilai },
-    { label: "Sudah dinilai", value: ringkasan.sudahDinilai },
-  ];
+    { label: "Total modul", value: ringkasan.totalModul, icon: Layers, tint: "stat-tile-tint-primary" },
+    { label: "Siswa aktif", value: ringkasan.siswaAktif, icon: Users, tint: "stat-tile-tint-info" },
+    { label: "Menunggu dinilai", value: ringkasan.menungguDinilai, icon: ClipboardCheck, tint: "stat-tile-tint-neutral" },
+    { label: "Sudah dinilai", value: ringkasan.sudahDinilai, icon: UserCheck, tint: "stat-tile-tint-success" },
+  ] as const;
 
   return (
     <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-      {items.map((item) => (
-        <div
-          key={item.label}
-          className="flex min-h-[4.5rem] flex-col items-center justify-center rounded-lg border bg-muted/20 px-3 py-3 text-center sm:min-h-[5.5rem]"
-        >
-          <p className="text-xl font-semibold tabular-nums sm:text-2xl">
-            {item.value}
-          </p>
-          <p className="text-[11px] leading-snug text-muted-foreground sm:text-xs">
-            {item.label}
-          </p>
+      {items.map(({ label, value, icon: Icon, tint }) => (
+        <div key={label} className={cn("stat-tile", tint)}>
+          <Icon className="mb-0.5 size-3.5 text-muted-foreground" aria-hidden />
+          <p className="text-xl font-semibold tabular-nums sm:text-2xl">{value}</p>
+          <p className="text-[11px] leading-snug text-muted-foreground sm:text-xs">{label}</p>
         </div>
       ))}
     </div>
@@ -75,9 +71,9 @@ function PrioritasCard({
 }) {
   if (totalMenunggu === 0) {
     return (
-      <Card size="sm" className="border-dashed">
+      <Card size="sm" className="border border-[var(--color-success-soft)] bg-[color-mix(in_srgb,var(--color-success-soft)_40%,var(--color-surface))]">
         <CardContent className="space-y-1 py-4">
-          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          <p className="text-xs font-medium tracking-wide text-muted-foreground">
             Perlu Perhatian
           </p>
           <p className="font-medium">Semua LKS sudah diperiksa</p>
@@ -93,10 +89,10 @@ function PrioritasCard({
   const href = `/guru/modul/${prioritas!.modulId}`;
 
   return (
-    <Card size="sm" className="border-dashed">
+    <Card size="sm" className="border border-[var(--color-warning-soft)] bg-[color-mix(in_srgb,var(--color-warning-soft)_45%,var(--color-surface))]">
       <CardContent className="flex flex-col gap-3 py-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="min-w-0 space-y-1">
-          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          <p className="text-xs font-medium tracking-wide text-muted-foreground">
             {satuModul ? "Perlu dinilai" : "LKS menunggu penilaian"}
           </p>
           <p className="font-medium leading-snug">
@@ -128,24 +124,28 @@ function ModulGuruCard({ modul }: { modul: ModulGuruDashboardItem }) {
     modul.status === "Belum ada aktivitas" ? "Buka Modul" : "Pantau & Nilai";
 
   return (
-    <Card size="sm" className="h-full">
+    <Card size="sm" className="group h-full border-border/80 bg-card transition-all duration-200 hover:-translate-y-px hover:border-[var(--color-border-strong)] hover:shadow-sm">
       <CardHeader className="gap-1 pb-0">
-        <div className="flex items-start justify-between gap-2">
-          <CardTitle className="line-clamp-2 text-base leading-snug">
-            {modul.judul}
-          </CardTitle>
-          <Badge
-            variant={statusBadgeVariant(modul.status)}
-            className="shrink-0 text-[10px]"
-          >
-            {modul.status}
-          </Badge>
+        <div className="flex items-start gap-3">
+          <ModuleIconImage
+            judul={modul.judul}
+            moduleId={modul.id}
+            animateOnHover
+          />
+          <div className="min-w-0 flex-1">
+            <div className="flex items-start justify-between gap-2">
+              <CardTitle className="line-clamp-2 text-base leading-snug">
+                {modul.judul}
+              </CardTitle>
+              <GuruModulStatusBadge status={modul.status} />
+            </div>
+            {modul.deskripsi ? (
+              <CardDescription className="mt-1 line-clamp-2 text-xs">
+                {modul.deskripsi}
+              </CardDescription>
+            ) : null}
+          </div>
         </div>
-        {modul.deskripsi ? (
-          <CardDescription className="line-clamp-2 text-xs">
-            {modul.deskripsi}
-          </CardDescription>
-        ) : null}
       </CardHeader>
       <CardContent className="flex flex-col gap-2.5 pt-2">
         <div className="flex flex-wrap gap-1.5">
@@ -210,15 +210,16 @@ export function GuruDashboard({
   );
 
   return (
-    <main className="mx-auto w-full max-w-5xl px-5 pb-[calc(6rem+env(safe-area-inset-bottom,0px))] pt-4 sm:px-6 sm:pt-6 lg:max-w-6xl">
+    <main className="page-container lg:max-w-6xl">
       <section className="mb-4 space-y-3">
         <div>
+          <div className="welcome-accent mb-2" aria-hidden />
           <h1 className="text-xl font-bold tracking-tight sm:text-2xl">
             Dasbor Guru
           </h1>
           <p className="mt-1 max-w-xl text-sm leading-relaxed text-muted-foreground">
-            Pantau progres praktikum, periksa LKS, dan lihat hasil belajar
-            siswa.
+            Pantau progres simulasi dan LKS, periksa jawaban, lalu nilai hasil
+            belajar siswa.
           </p>
         </div>
         <RingkasanGrid ringkasan={ringkasan} />
@@ -233,8 +234,8 @@ export function GuruDashboard({
       </section>
 
       {modul.length === 0 ? (
-        <div className="rounded-lg border border-dashed px-4 py-10 text-center">
-          <p className="font-medium">Belum ada modul praktikum</p>
+        <div className="rounded-xl border border-dashed px-4 py-8 text-center">
+          <p className="font-medium">{UI_COPY.belumAdaModul}</p>
           <p className="mt-1 text-sm text-muted-foreground">
             Modul yang tersedia akan muncul di sini.
           </p>
@@ -242,7 +243,7 @@ export function GuruDashboard({
       ) : (
         <>
           <div className="mb-3 flex items-end justify-between gap-2">
-            <h2 className="text-sm font-semibold">Modul Praktikum</h2>
+            <h2 className="text-sm font-semibold">{UI_COPY.modulSimulasi}</h2>
             <span className="shrink-0 text-xs text-muted-foreground">
               {modul.length} modul
             </span>
@@ -256,9 +257,7 @@ export function GuruDashboard({
                 onClick={() => setFilter(opsi)}
                 className={cn(
                   "shrink-0 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors min-h-[44px] sm:min-h-0 sm:py-1",
-                  filter === opsi
-                    ? "border-foreground bg-foreground text-background"
-                    : "border-border bg-background text-muted-foreground hover:text-foreground",
+                  filter === opsi ? "filter-chip-active" : "filter-chip-inactive",
                 )}
               >
                 {opsi}

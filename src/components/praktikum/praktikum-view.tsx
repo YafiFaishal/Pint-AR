@@ -202,7 +202,7 @@ export function PraktikumView({
   return (
     <div className="flex h-dvh flex-col">
       {/* Bilah atas */}
-      <header className="flex items-center justify-between gap-3 border-b px-4 py-2.5">
+      <header className="flex items-center justify-between gap-3 border-b px-4 py-2.5 pt-[calc(0.625rem+env(safe-area-inset-top,0px))]">
         <div className="flex min-w-0 items-center gap-2">
           <Button
             render={<Link href="/siswa" />}
@@ -228,7 +228,7 @@ export function PraktikumView({
         <section
           className={cn(
             "relative shrink-0 bg-gradient-to-b from-muted/60 to-muted",
-            !interaktif && "h-[45vh] lg:h-auto lg:flex-1",
+            !interaktif && "h-[clamp(200px,40dvh,400px)] lg:h-auto lg:flex-1",
           )}
         >
           {belumSiap ? (

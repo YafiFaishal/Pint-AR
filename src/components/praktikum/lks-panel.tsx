@@ -212,7 +212,7 @@ export function LksPanel({
           className="mt-4 min-h-11"
           onClick={onClose}
         >
-          Kembali ke Praktikum
+          Kembali ke Simulasi
         </Button>
       ) : null}
     </div>
@@ -369,10 +369,10 @@ export function LksPanel({
           variant="ghost"
           className="mb-2 min-h-11 -ml-2 gap-2 px-2"
           onClick={onClose}
-          aria-label="Kembali ke Praktikum"
+          aria-label="Kembali ke Simulasi"
         >
           <ArrowLeft className="size-4" />
-          Kembali ke Praktikum
+          Kembali ke Simulasi
         </Button>
         <div className="space-y-0.5">
           <h2 className="text-base font-semibold leading-snug">

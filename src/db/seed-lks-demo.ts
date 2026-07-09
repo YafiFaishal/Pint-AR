@@ -7,12 +7,6 @@ import { randomUUID } from "node:crypto";
 import { asc, eq } from "drizzle-orm";
 import { db, user, modul, lksTemplate, jawabanLks } from "./index";
 
-type JawabanPreset = {
-  jawaban: string;
-  skor?: number;
-  dinilai?: boolean;
-};
-
 /** Jawaban contoh per modul (urutan soal dimulai dari 1). */
 const CONTOH: Record<string, Record<number, string>> = {
   "Hukum Newton: Gaya & Gerak": {

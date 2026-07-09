@@ -18,28 +18,35 @@ const UKURAN_BULAN = 0.016;
 /** Periode orbit Bulan (detik) — independen dari Kepler, lebih cepat dari Bumi */
 const PERIODE_ORBIT_BULAN = 1.6;
 
-function Starfield() {
-  const posisi = useMemo(() => {
-    const n = 96;
-    const buf = new Float32Array(n * 3);
-    for (let i = 0; i < n; i++) {
-      const theta = Math.random() * Math.PI * 2;
-      const phi = Math.acos(2 * Math.random() - 1);
-      const r = 14 + Math.random() * 10;
-      buf[i * 3] = r * Math.sin(phi) * Math.cos(theta);
-      buf[i * 3 + 1] = r * Math.cos(phi) * 0.35 + 1.5;
-      buf[i * 3 + 2] = r * Math.sin(phi) * Math.sin(theta);
-    }
-    return buf;
-  }, []);
+/** Pseudo-random deterministik 0..1 — aman untuk render (bukan Math.random). */
+function starFraction(i: number, salt: number): number {
+  const x = Math.sin(i * 127.1 + salt * 311.7) * 43758.5453123;
+  return x - Math.floor(x);
+}
 
+function buatPosisiStarfield(n: number): Float32Array {
+  const buf = new Float32Array(n * 3);
+  for (let i = 0; i < n; i++) {
+    const theta = starFraction(i, 1) * Math.PI * 2;
+    const phi = Math.acos(2 * starFraction(i, 2) - 1);
+    const r = 14 + starFraction(i, 3) * 10;
+    buf[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+    buf[i * 3 + 1] = r * Math.cos(phi) * 0.35 + 1.5;
+    buf[i * 3 + 2] = r * Math.sin(phi) * Math.sin(theta);
+  }
+  return buf;
+}
+
+const STARFIELD_POSITIONS = buatPosisiStarfield(96);
+
+function Starfield() {
   return (
     <points frustumCulled={false}>
       <bufferGeometry>
         <bufferAttribute
           attach="attributes-position"
-          args={[posisi, 3]}
-          count={posisi.length / 3}
+          args={[STARFIELD_POSITIONS, 3]}
+          count={STARFIELD_POSITIONS.length / 3}
         />
       </bufferGeometry>
       <pointsMaterial

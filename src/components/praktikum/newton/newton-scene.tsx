@@ -203,7 +203,6 @@ function BalokDenganGaya({
 export function NewtonScene({
   mass,
   force,
-  acceleration,
   pushSignal,
   resetSignal,
 }: {

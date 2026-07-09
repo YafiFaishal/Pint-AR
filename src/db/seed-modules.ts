@@ -99,7 +99,7 @@ async function main() {
       id: randomUUID(),
       modulId,
       urutan: 1,
-      judul: "Praktikum Sedang Disiapkan",
+      judul: "Simulasi Sedang Disiapkan",
       instruksi: item.instruksi,
     });
 

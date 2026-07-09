@@ -36,12 +36,12 @@ const PILIHAN_PERAN: {
     {
       value: "siswa",
       judul: "Siswa",
-      deskripsi: "Mengikuti praktikum dan mengisi LKS",
+      deskripsi: "Menjalankan simulasi dan mengisi LKS",
     },
     {
       value: "guru",
       judul: "Guru",
-      deskripsi: "Memantau progres dan memberi nilai",
+      deskripsi: "Memantau progres simulasi dan menilai LKS",
     },
   ];
 

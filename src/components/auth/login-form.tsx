@@ -74,7 +74,7 @@ export function LoginForm() {
             Masuk
           </CardTitle>
           <CardDescription className="text-sm leading-relaxed">
-            Lanjutkan praktikum, isi LKS, atau pantau kelas.
+            Lanjutkan simulasi, isi LKS, atau pantau kelas.
           </CardDescription>
         </CardHeader>
         <CardContent>

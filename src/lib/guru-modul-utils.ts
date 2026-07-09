@@ -1,4 +1,3 @@
-import type { Modul } from "@/db/schema";
 import {
   getKategoriModul,
   type KategoriModul,

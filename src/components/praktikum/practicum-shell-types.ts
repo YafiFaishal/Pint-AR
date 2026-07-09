@@ -10,6 +10,8 @@ export type PracticumShellProps = {
   controls: ReactNode;
   guide: ReactNode;
   arButton?: ReactNode;
+  /** Petunjuk AR di bawah bar aksi (bukan di dalam sel tombol). */
+  arHint?: string | null;
   backHref?: string;
   sceneClassName?: string;
   layoutVariant?: "interactive" | "default";

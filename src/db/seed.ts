@@ -202,7 +202,7 @@ async function seed() {
       id: randomUUID(),
       modulId: modulJatuhBebasId,
       urutan: 1,
-      judul: "Praktikum Sedang Disiapkan",
+      judul: "Simulasi Sedang Disiapkan",
       instruksi:
         "Simulasi gerak jatuh bebas di udara dan ruang hampa sedang dikembangkan. Pantau pembaruan berikutnya.",
     },
@@ -210,7 +210,7 @@ async function seed() {
       id: randomUUID(),
       modulId: modulReaksiKimiaId,
       urutan: 1,
-      judul: "Praktikum Sedang Disiapkan",
+      judul: "Simulasi Sedang Disiapkan",
       instruksi:
         "Simulasi pencampuran bahan kimia sedang dikembangkan. Pantau pembaruan berikutnya.",
     },
@@ -218,7 +218,7 @@ async function seed() {
       id: randomUUID(),
       modulId: modulArchimedesId,
       urutan: 1,
-      judul: "Praktikum Sedang Disiapkan",
+      judul: "Simulasi Sedang Disiapkan",
       instruksi:
         "Simulasi Hukum Archimedes sedang dikembangkan. Pantau pembaruan berikutnya.",
     },
@@ -226,7 +226,7 @@ async function seed() {
       id: randomUUID(),
       modulId: modulCahayaOptikId,
       urutan: 1,
-      judul: "Praktikum Sedang Disiapkan",
+      judul: "Simulasi Sedang Disiapkan",
       instruksi:
         "Simulasi pemantulan dan pembiasan cahaya sedang dikembangkan. Pantau pembaruan berikutnya.",
     },
@@ -234,7 +234,7 @@ async function seed() {
       id: randomUUID(),
       modulId: modulBandulId,
       urutan: 1,
-      judul: "Praktikum Sedang Disiapkan",
+      judul: "Simulasi Sedang Disiapkan",
       instruksi:
         "Simulasi getaran bandul sederhana sedang dikembangkan. Pantau pembaruan berikutnya.",
     },
@@ -242,7 +242,7 @@ async function seed() {
       id: randomUUID(),
       modulId: modulHookeId,
       urutan: 1,
-      judul: "Praktikum Sedang Disiapkan",
+      judul: "Simulasi Sedang Disiapkan",
       instruksi:
         "Simulasi Hukum Hooke dan elastisitas pegas sedang dikembangkan. Pantau pembaruan berikutnya.",
     },
@@ -250,7 +250,7 @@ async function seed() {
       id: randomUUID(),
       modulId: modulThermalId,
       urutan: 1,
-      judul: "Praktikum Sedang Disiapkan",
+      judul: "Simulasi Sedang Disiapkan",
       instruksi:
         "Simulasi kalor dan perubahan suhu sedang dikembangkan. Pantau pembaruan berikutnya.",
     },

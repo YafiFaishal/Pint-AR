@@ -1,67 +1,96 @@
 import Link from "next/link";
+import { Fraunces, Inter } from "next/font/google";
 import { AuthShell, AuthNavLink } from "@/components/auth/auth-shell";
+import { LandingFeatureStrip } from "@/components/landing/landing-feature-strip";
+import { PintARHeroIllustration } from "@/components/landing/landing-hero-visual";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import {
+  PINTAR_DISCLAIMER,
   PINTAR_FOOTER,
   PINTAR_HERO_DESCRIPTION,
-  PINTAR_HERO_HEADLINE,
-  PINTAR_SUBTITLE,
+  PINTAR_HERO_EYEBROW,
+  PINTAR_HERO_MICRO,
+  UI_COPY,
 } from "@/lib/branding";
 
-const VALUE_POINTS = [
-  "Tanpa instal aplikasi",
-  "Simulasi 3D dan AR",
-  "LKS terintegrasi",
-] as const;
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  variable: "--font-landing-display",
+  display: "swap",
+});
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-landing-body",
+  display: "swap",
+});
 
 export default function Home() {
   return (
     <AuthShell
       variant="landing"
+      rootClassName={cn(fraunces.variable, inter.variable, "landing-shell")}
       headerRight={
         <>
-          <AuthNavLink href="/masuk">Masuk</AuthNavLink>
-          <AuthNavLink href="/daftar">Daftar</AuthNavLink>
+          <AuthNavLink href="/masuk" className="landing-nav-link">
+            Masuk
+          </AuthNavLink>
+          <AuthNavLink href="/daftar" className="landing-nav-link">
+            Daftar
+          </AuthNavLink>
         </>
       }
-      footer={PINTAR_FOOTER}
+      footer={
+        <span className="flex flex-col gap-1.5">
+          <span>{PINTAR_FOOTER}</span>
+          <span className="text-[11px] opacity-80">{PINTAR_DISCLAIMER}</span>
+        </span>
+      }
     >
-      <div className="flex w-full flex-col items-center gap-8 text-center sm:gap-10">
-        <p className="max-w-2xl text-xs font-medium leading-snug text-muted-foreground sm:text-sm">
-          {PINTAR_SUBTITLE}
-        </p>
+      <section className="landing-page landing-hero w-full">
+        <div className="landing-page-grid">
+          <div className="landing-hero-copy landing-enter">
+            <p className="landing-eyebrow">{PINTAR_HERO_EYEBROW}</p>
+            <h1 className="landing-headline landing-enter-delay-1">
+              Jelajahi konsep sains
+              <br />
+              langsung dari meja belajarmu
+            </h1>
+            <p className="landing-description landing-enter-delay-1">
+              {PINTAR_HERO_DESCRIPTION}
+            </p>
+          </div>
 
-        <div className="space-y-4">
-          <h1 className="text-[1.75rem] font-bold leading-[1.15] tracking-tight sm:text-3xl lg:text-4xl">
-            {PINTAR_HERO_HEADLINE}
-          </h1>
-          <p className="mx-auto max-w-md text-sm leading-[1.55] text-muted-foreground sm:text-base">
-            {PINTAR_HERO_DESCRIPTION}
-          </p>
+          <div className="landing-hero-col landing-enter-delay-2">
+            <PintARHeroIllustration />
+          </div>
+
+          <div className="landing-cta landing-enter-delay-2">
+            <Button
+              render={<Link href="/daftar" />}
+              nativeButton={false}
+              className="landing-cta-btn landing-cta-primary"
+            >
+              <span className="sm:hidden">Mulai</span>
+              <span className="hidden sm:inline">{UI_COPY.mulaiBelajar}</span>
+            </Button>
+            <Button
+              render={<Link href="/masuk" />}
+              nativeButton={false}
+              variant="outline"
+              className="landing-cta-btn landing-cta-secondary"
+            >
+              <span className="sm:hidden">Masuk</span>
+              <span className="hidden sm:inline">{UI_COPY.masukKeAkun}</span>
+            </Button>
+          </div>
+
+          <LandingFeatureStrip className="landing-features landing-enter-delay-3" />
+
+          <p className="landing-micro landing-enter-delay-3">{PINTAR_HERO_MICRO}</p>
         </div>
-
-        <div className="flex w-full max-w-sm flex-col gap-3 pt-1 sm:max-w-none sm:flex-row sm:justify-center sm:gap-4">
-          <Button
-            render={<Link href="/daftar" />}
-            nativeButton={false}
-            className="min-h-[52px] w-full sm:w-auto"
-          >
-            Mulai Sekarang
-          </Button>
-          <Button
-            render={<Link href="/masuk" />}
-            nativeButton={false}
-            variant="outline"
-            className="min-h-[52px] w-full sm:w-auto"
-          >
-            Masuk ke akun
-          </Button>
-        </div>
-
-        <p className="text-xs leading-relaxed text-muted-foreground">
-          {VALUE_POINTS.join(" · ")}
-        </p>
-      </div>
+      </section>
     </AuthShell>
   );
 }

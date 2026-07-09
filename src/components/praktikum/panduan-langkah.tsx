@@ -17,7 +17,7 @@ import { Progress } from "@/components/ui/progress";
 export const INSTRUKSI_3D = {
   judul: "Amati Model 3D",
   deskripsi:
-    "Putar model dengan satu jari, cubit untuk memperbesar, lalu ikuti langkah praktikum dan isi LKS.",
+            "Putar model dengan satu jari, cubit untuk memperbesar, lalu ikuti langkah panduan dan isi LKS.",
 } as const;
 
 export const INSTRUKSI_NEWTON_3D = {
@@ -162,8 +162,8 @@ function PanduanSelesaiView({
       <div className="max-w-sm space-y-2">
         <h2 className="text-2xl font-semibold leading-snug">Panduan Selesai</h2>
         <p className="text-sm leading-relaxed text-muted-foreground">
-          Kamu sudah membaca seluruh langkah panduan. Sekarang lakukan
-          eksperimen dan catat hasil pengamatanmu pada LKS.
+          Kamu sudah membaca seluruh langkah panduan. Sekarang eksplorasi
+          variabel pada simulasi dan catat hasil pengamatanmu pada LKS.
         </p>
       </div>
       <div className="flex w-full max-w-sm flex-col gap-2.5">
@@ -322,7 +322,7 @@ export function PanduanLangkah({
       <div className="mb-4 space-y-3">
         <div className="flex items-center justify-between gap-2">
           <h3 className="text-sm font-semibold leading-snug">
-            Panduan Praktikum
+            Panduan Simulasi
           </h3>
           <span className="shrink-0 text-xs font-medium tabular-nums text-muted-foreground">
             {idx + 1}/{total}

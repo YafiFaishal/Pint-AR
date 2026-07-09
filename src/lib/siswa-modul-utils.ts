@@ -9,7 +9,7 @@ export type KategoriModul = "Fisika" | "Kimia" | "Astronomi";
 
 export type StatusModul =
   | "Belum mulai"
-  | "Sedang dikerjakan"
+  | "Sedang dipelajari"
   | "LKS belum lengkap"
   | "LKS selesai"
   | "Sudah dinilai";
@@ -54,9 +54,9 @@ export function tombolAksiModul(status: StatusModul): string {
     case "Sudah dinilai":
       return "Lihat hasil";
     case "Belum mulai":
-      return "Mulai";
+      return "Mulai Simulasi";
     default:
-      return "Lanjutkan";
+      return "Lanjutkan Simulasi";
   }
 }
 

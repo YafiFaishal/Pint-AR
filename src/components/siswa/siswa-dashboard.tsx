@@ -8,8 +8,10 @@ import {
   Box,
   ChevronRight,
   ClipboardList,
+  Layers,
   ScanLine,
   Star,
+  Trophy,
 } from "lucide-react";
 import type {
   ModulDashboardItem,
@@ -33,6 +35,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { PINTAR_DISCLAIMER, UI_COPY } from "@/lib/branding";
+import { ModuleIconImage } from "@/components/module-icon-image";
+import { SiswaStatusBadge } from "@/components/status-badge";
 
 const FILTER_OPSI: FilterModul[] = [
   "Semua",
@@ -42,19 +47,97 @@ const FILTER_OPSI: FilterModul[] = [
   "Belum selesai",
 ];
 
-function statusVariant(
-  status: StatusModul,
-): "default" | "secondary" | "outline" {
-  switch (status) {
-    case "Sudah dinilai":
-      return "default";
-    case "LKS selesai":
-      return "secondary";
-    default:
-      return "outline";
-  }
-}
+function ModulCard({ modul }: { modul: ModulDashboardItem }) {
+  const aksi = tombolAksiModul(modul.status);
+  const href = `/praktikum/${modul.id}`;
 
+  return (
+    <Link
+      href={href}
+      onClick={() => setLastModule({ id: modul.id, judul: modul.judul })}
+      className="group block min-h-[44px] rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+    >
+      <Card
+        size="sm"
+        className="h-full border-border/80 bg-card transition-all duration-200 hover:-translate-y-px hover:border-[var(--color-border-strong)] hover:shadow-sm"
+      >
+        <CardHeader className="gap-1 pb-0">
+          <div className="flex items-start gap-3">
+            <ModuleIconImage
+              judul={modul.judul}
+              moduleId={modul.id}
+              animateOnHover
+            />
+            <div className="min-w-0 flex-1">
+              <div className="flex items-start justify-between gap-2">
+                <CardTitle className="line-clamp-2 text-base leading-snug">
+                  {modul.judul}
+                </CardTitle>
+                <SiswaStatusBadge status={modul.status} />
+              </div>
+              {modul.deskripsi ? (
+                <CardDescription className="mt-1 line-clamp-2 text-xs">
+                  {modul.deskripsi}
+                </CardDescription>
+              ) : null}
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-2.5 pt-2">
+          <div className="flex flex-wrap gap-1.5">
+            <Badge
+              variant="outline"
+              className="border-current/15 text-[10px]"
+              style={{
+                color:
+                  modul.kategori === "Kimia"
+                    ? "var(--chemistry)"
+                    : modul.kategori === "Astronomi"
+                      ? "var(--astronomy)"
+                      : "var(--physics)",
+                background:
+                  modul.kategori === "Kimia"
+                    ? "var(--chemistry-soft)"
+                    : modul.kategori === "Astronomi"
+                      ? "var(--astronomy-soft)"
+                      : "var(--physics-soft)",
+              }}
+            >
+              {modul.kategori}
+            </Badge>
+            {modul.jumlahLangkah > 0 ? (
+              <Badge variant="outline" className="text-[10px]">
+                {modul.jumlahLangkah} langkah
+              </Badge>
+            ) : null}
+            <Badge variant="outline" className="text-[10px]">
+              {modul.arSiap ? "AR tersedia" : "AR belum siap"}
+            </Badge>
+            <Badge variant="outline" className="text-[10px]">
+              {modul.lksTersedia
+                ? `LKS ${modul.dijawab}/${modul.totalSoalLks} soal`
+                : "LKS tersedia"}
+            </Badge>
+          </div>
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-xs text-muted-foreground group-hover:text-foreground">
+              {UI_COPY.bukaSimulasi}
+            </span>
+            <Button
+              variant={modul.status === "Belum mulai" ? "default" : "outline"}
+              size="sm"
+              className="pointer-events-none min-h-[44px] min-w-[7rem] shrink-0"
+              tabIndex={-1}
+            >
+              {aksi}
+              <ChevronRight className="size-3.5" />
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </Link>
+  );
+}
 function arInfoPesan(): string {
   if (typeof navigator === "undefined") {
     return "Gunakan perangkat mobile untuk pengalaman AR.";
@@ -92,74 +175,6 @@ function useArInfo() {
   );
 }
 
-function ModulCard({ modul }: { modul: ModulDashboardItem }) {
-  const aksi = tombolAksiModul(modul.status);
-  const href = `/praktikum/${modul.id}`;
-
-  return (
-    <Link
-      href={href}
-      onClick={() => setLastModule({ id: modul.id, judul: modul.judul })}
-      className="group block min-h-[44px] rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-    >
-      <Card
-        size="sm"
-        className="h-full transition-colors hover:bg-muted/30 active:bg-muted/40"
-      >
-        <CardHeader className="gap-1 pb-0">
-          <div className="flex items-start justify-between gap-2">
-            <CardTitle className="line-clamp-2 text-base leading-snug">
-              {modul.judul}
-            </CardTitle>
-            <Badge variant={statusVariant(modul.status)} className="shrink-0 text-[10px]">
-              {modul.status}
-            </Badge>
-          </div>
-          {modul.deskripsi ? (
-            <CardDescription className="line-clamp-2 text-xs">
-              {modul.deskripsi}
-            </CardDescription>
-          ) : null}
-        </CardHeader>
-        <CardContent className="flex flex-col gap-2.5 pt-2">
-          <div className="flex flex-wrap gap-1.5">
-            <Badge variant="outline" className="text-[10px]">
-              {modul.kategori}
-            </Badge>
-            {modul.jumlahLangkah > 0 ? (
-              <Badge variant="outline" className="text-[10px]">
-                {modul.jumlahLangkah} langkah
-              </Badge>
-            ) : null}
-            <Badge variant="outline" className="text-[10px]">
-              {modul.arSiap ? "AR tersedia" : "AR belum siap"}
-            </Badge>
-            <Badge variant="outline" className="text-[10px]">
-              {modul.lksTersedia
-                ? `LKS ${modul.dijawab}/${modul.totalSoalLks} soal`
-                : "LKS tersedia"}
-            </Badge>
-          </div>
-          <div className="flex items-center justify-between gap-2">
-            <span className="text-xs text-muted-foreground group-hover:text-foreground">
-              Buka praktikum
-            </span>
-            <Button
-              variant={modul.status === "Belum mulai" ? "default" : "outline"}
-              size="sm"
-              className="pointer-events-none min-h-[44px] min-w-[7rem] shrink-0"
-              tabIndex={-1}
-            >
-              {aksi}
-              <ChevronRight className="size-3.5" />
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    </Link>
-  );
-}
-
 function ContinueCard({
   modul,
   modulList,
@@ -179,19 +194,25 @@ function ContinueCard({
   const href = `/praktikum/${target.id}`;
 
   return (
-    <Card size="sm" className="border-dashed">
+    <Card size="sm" className="continue-simulation-card">
       <CardContent className="flex flex-col gap-3 py-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="min-w-0 space-y-1">
-          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            {adaLast ? "Lanjutkan Praktikum" : "Rekomendasi Modul"}
-          </p>
-          <p className="truncate font-medium">{target.judul}</p>
-          <p className="text-xs text-muted-foreground">
-            Status: {target.status}
-            {target.lksTersedia
-              ? ` · LKS ${target.dijawab}/${target.totalSoalLks}`
-              : ""}
-          </p>
+        <div className="flex min-w-0 items-start gap-3">
+          <ModuleIconImage
+            judul={target.judul}
+            moduleId={target.id}
+          />
+          <div className="min-w-0 space-y-1">
+            <p className="text-xs font-medium tracking-wide text-primary">
+              {adaLast ? UI_COPY.lanjutkanSimulasi : UI_COPY.rekomendasiModul}
+            </p>
+            <p className="truncate font-medium">{target.judul}</p>
+            <p className="text-xs text-muted-foreground">
+              Status: {target.status}
+              {target.lksTersedia
+                ? ` · LKS ${target.dijawab}/${target.totalSoalLks}`
+                : ""}
+            </p>
+          </div>
         </div>
         <Link
           href={href}
@@ -199,7 +220,7 @@ function ContinueCard({
           className="w-full shrink-0 sm:w-auto"
         >
           <Button size="sm" className="min-h-[44px] w-full sm:w-auto">
-            {adaLast ? "Lanjutkan" : "Mulai dari rekomendasi"}
+            {adaLast ? UI_COPY.lanjutkanSimulasi : UI_COPY.mulaiSimulasi}
             <ArrowRight className="size-3.5" />
           </Button>
         </Link>
@@ -210,21 +231,43 @@ function ContinueCard({
 
 function RingkasanGrid({ ringkasan }: { ringkasan: RingkasanProgres }) {
   const items = [
-    { label: "Total modul", value: ringkasan.totalModul },
-    { label: "Belum mulai", value: ringkasan.belumMulai },
-    { label: "LKS selesai", value: ringkasan.lksSelesai },
-    { label: "Sudah dinilai", value: ringkasan.sudahDinilai },
-  ];
+    {
+      label: "Total modul",
+      value: ringkasan.totalModul,
+      icon: Layers,
+      tint: "stat-tile-tint-primary",
+    },
+    {
+      label: "Belum mulai",
+      value: ringkasan.belumMulai,
+      icon: BookOpen,
+      tint: "stat-tile-tint-neutral",
+    },
+    {
+      label: "LKS selesai",
+      value: ringkasan.lksSelesai,
+      icon: ClipboardList,
+      tint: "stat-tile-tint-info",
+    },
+    {
+      label: "Sudah dinilai",
+      value: ringkasan.sudahDinilai,
+      icon: Trophy,
+      tint: "stat-tile-tint-success",
+    },
+  ] as const;
 
   return (
     <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-      {items.map((item) => (
-        <div
-          key={item.label}
-          className="rounded-lg border bg-muted/20 px-3 py-2 text-center"
-        >
-          <p className="text-lg font-semibold tabular-nums">{item.value}</p>
-          <p className="text-[11px] text-muted-foreground">{item.label}</p>
+      {items.map(({ label, value, icon: Icon, tint }) => (
+        <div key={label} className={cn("stat-tile", tint)}>
+          <Icon className="mb-0.5 size-3.5 text-muted-foreground" aria-hidden />
+          <p className="text-xl font-semibold tabular-nums sm:text-2xl">
+            {value}
+          </p>
+          <p className="text-[11px] leading-snug text-muted-foreground sm:text-xs">
+            {label}
+          </p>
         </div>
       ))}
     </div>
@@ -255,7 +298,7 @@ export function SiswaDashboard({
   const modul = useMemo(() => {
     return modulAwal.map((m) => {
       if (m.status === "Belum mulai" && lastModuleId === m.id) {
-        return { ...m, status: "Sedang dikerjakan" as StatusModul };
+        return { ...m, status: "Sedang dipelajari" as StatusModul };
       }
       return m;
     });
@@ -272,14 +315,15 @@ export function SiswaDashboard({
   );
 
   return (
-    <main className="mx-auto w-full max-w-5xl px-5 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] pt-4 sm:px-6 sm:pt-6">
+    <main className="page-container">
       <section className="mb-4 space-y-3">
         <div>
+          <div className="welcome-accent mb-2" aria-hidden />
           <h1 className="text-xl font-bold tracking-tight sm:text-2xl">
-            Selamat datang, {namaDepan}!
+            Selamat datang, {namaDepan}
           </h1>
-          <p className="text-sm text-muted-foreground">
-            Pilih praktikum dan lanjutkan pengamatanmu.
+          <p className="mt-1 max-w-xl text-sm leading-relaxed text-muted-foreground">
+            Pilih modul simulasi dan lanjutkan eksplorasimu.
           </p>
         </div>
         <RingkasanGrid ringkasan={ringkasan} />
@@ -301,9 +345,7 @@ export function SiswaDashboard({
                 onClick={() => setFilter(opsi)}
                 className={cn(
                   "shrink-0 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors min-h-[44px] sm:min-h-0 sm:py-1",
-                  filter === opsi
-                    ? "border-foreground bg-foreground text-background"
-                    : "border-border bg-background text-muted-foreground hover:text-foreground",
+                  filter === opsi ? "filter-chip-active" : "filter-chip-inactive",
                 )}
               >
                 {opsi}
@@ -324,8 +366,8 @@ export function SiswaDashboard({
           )}
         </>
       ) : (
-        <div className="rounded-lg border border-dashed px-4 py-10 text-center">
-          <p className="font-medium">Belum ada modul praktikum.</p>
+        <div className="rounded-xl border border-dashed px-4 py-8 text-center">
+          <p className="font-medium">{UI_COPY.belumAdaModul}</p>
           <p className="mt-1 text-sm text-muted-foreground">
             Hubungi guru untuk membuka modul.
           </p>
@@ -333,7 +375,7 @@ export function SiswaDashboard({
       )}
 
       <section className="mt-6 space-y-3">
-        <h2 className="text-sm font-semibold">Alur Praktikum</h2>
+        <h2 className="text-sm font-semibold">{UI_COPY.alurBelajar}</h2>
         <ol className="grid gap-2 sm:grid-cols-5">
           {ALUR.map(({ icon: Icon, teks }, i) => (
             <li
@@ -352,6 +394,9 @@ export function SiswaDashboard({
         </ol>
         <p className="text-[11px] leading-relaxed text-muted-foreground">
           {arInfo}
+        </p>
+        <p className="text-[11px] leading-relaxed text-muted-foreground">
+          {PINTAR_DISCLAIMER}
         </p>
       </section>
     </main>

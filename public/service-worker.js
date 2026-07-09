@@ -9,7 +9,7 @@ self.addEventListener("activate", (event) => {
       try {
         const keys = await caches.keys();
         await Promise.all(keys.map((k) => caches.delete(k)));
-      } catch (e) {
+      } catch {
         // abaikan
       }
       await self.registration.unregister();

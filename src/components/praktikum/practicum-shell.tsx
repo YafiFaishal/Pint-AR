@@ -9,9 +9,10 @@ import {
   type ReactNode,
 } from "react";
 import Link from "next/link";
-import { ArrowLeft, ClipboardList } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { SimulationLksActionButton } from "@/components/praktikum/simulation-action-button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   PracticumPanelProvider,
@@ -32,7 +33,7 @@ const SHEET_BODY_CLASS =
   "min-h-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-y-contain touch-pan-y [-webkit-overflow-scrolling:touch]";
 
 const SHEET_FOOTER_CLASS =
-  "shrink-0 border-t bg-background px-4 py-2.5 pb-[calc(0.625rem+env(safe-area-inset-bottom,0px))]";
+  "shrink-0 border-t bg-background px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))]";
 
 const DESKTOP_TAB_PANEL_CLASS =
   "min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-4 pt-2";
@@ -41,39 +42,44 @@ type ControlPanelSize = "compact" | "medium";
 
 function PanelActionFooter({
   arButton,
+  arHint,
   lksAvailability,
   isLKSOpen,
   onOpenLKS,
 }: {
   arButton?: ReactNode;
+  arHint?: string | null;
   lksAvailability: "loading" | "available" | "unavailable";
   isLKSOpen: boolean;
   onOpenLKS: () => void;
 }) {
   const lksDisabled =
     lksAvailability === "loading" || lksAvailability === "unavailable";
+  const lksUnavailable = lksAvailability === "unavailable";
 
   return (
-    <div className="grid grid-cols-1 gap-2.5 min-[380px]:grid-cols-2">
-      {arButton ? <div className="min-w-0">{arButton}</div> : null}
-      <Button
-        type="button"
-        data-practicum-open-lks
-        className="min-h-12 w-full gap-2 text-sm"
-        disabled={lksDisabled}
-        aria-expanded={isLKSOpen}
-        aria-label={
-          lksAvailability === "unavailable"
-            ? "LKS belum tersedia"
-            : "Kerjakan LKS"
-        }
-        onClick={onOpenLKS}
+    <div className="space-y-2">
+      <div
+        className={cn(
+          "grid gap-3",
+          arButton ? "grid-cols-2" : "grid-cols-1",
+        )}
       >
-        <ClipboardList className="size-[1.125rem] shrink-0" aria-hidden />
-        {lksAvailability === "unavailable"
-          ? "LKS belum tersedia"
-          : "Kerjakan LKS"}
-      </Button>
+        {arButton ? (
+          <div className="min-w-0 w-full">{arButton}</div>
+        ) : null}
+        <SimulationLksActionButton
+          onClick={onOpenLKS}
+          disabled={lksDisabled}
+          unavailable={lksUnavailable}
+          isOpen={isLKSOpen}
+        />
+      </div>
+      {arHint ? (
+        <p className="px-0.5 text-[10px] leading-snug text-muted-foreground lg:text-[11px]">
+          {arHint}
+        </p>
+      ) : null}
     </div>
   );
 }
@@ -139,6 +145,7 @@ function MobilePracticumSheet({
   guide,
   quickInfo,
   arButton,
+  arHint,
   quickInfoInSheet,
   controlPanelSize,
   activeTab,
@@ -153,7 +160,7 @@ function MobilePracticumSheet({
   backToSimulation,
 }: Pick<
   PracticumShellProps,
-  "controls" | "guide" | "quickInfo" | "arButton"
+  "controls" | "guide" | "quickInfo" | "arButton" | "arHint"
 > & {
   quickInfoInSheet: boolean;
   controlPanelSize: ControlPanelSize;
@@ -283,7 +290,7 @@ function MobilePracticumSheet({
               <div className="space-y-3">
                 {quickInfoInSheet && quickInfo ? <div>{quickInfo}</div> : null}
                 <h3 className="text-lg font-semibold leading-snug">
-                  Kontrol Eksperimen
+                  Kontrol Simulasi
                 </h3>
                 {controls}
               </div>
@@ -298,6 +305,7 @@ function MobilePracticumSheet({
               ) : null}
               <PanelActionFooter
                 arButton={arButton}
+                arHint={arHint}
                 lksAvailability={lksAvailability}
                 isLKSOpen={isLKSOpen}
                 onOpenLKS={onOpenLKS}
@@ -315,12 +323,14 @@ function MobilePracticumSheet({
 function DesktopSidebar({
   guide,
   arButton,
+  arHint,
   lksAvailability,
   isLKSOpen,
   onOpenLKS,
 }: {
   guide: ReactNode;
   arButton?: ReactNode;
+  arHint?: string | null;
   lksAvailability: "loading" | "available" | "unavailable";
   isLKSOpen: boolean;
   onOpenLKS: () => void;
@@ -329,12 +339,13 @@ function DesktopSidebar({
     <aside className="hidden min-h-0 w-full flex-col overflow-hidden border-t bg-background lg:flex lg:max-w-md lg:border-l lg:border-t-0">
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
         <div className="shrink-0 border-b px-4 py-3">
-          <h3 className="text-sm font-semibold">Panduan Praktikum</h3>
+          <h3 className="text-sm font-semibold">Panduan Simulasi</h3>
         </div>
         <div className={DESKTOP_TAB_PANEL_CLASS}>{guide}</div>
         <div className={SHEET_FOOTER_CLASS}>
           <PanelActionFooter
             arButton={arButton}
+            arHint={arHint}
             lksAvailability={lksAvailability}
             isLKSOpen={isLKSOpen}
             onOpenLKS={onOpenLKS}
@@ -355,6 +366,7 @@ export function PracticumShell({
   controls,
   guide,
   arButton,
+  arHint,
   backHref = "/siswa",
   sceneClassName,
   layoutVariant = "interactive",
@@ -481,7 +493,7 @@ export function PracticumShell({
 
           <div className="hidden min-h-0 shrink-0 flex-col border-t bg-background lg:flex lg:max-h-[42%]">
             <div className="space-y-3 overflow-y-auto p-4">
-              <h3 className="text-lg font-semibold">Kontrol Eksperimen</h3>
+              <h3 className="text-lg font-semibold">Kontrol Simulasi</h3>
               {controls}
             </div>
           </div>
@@ -492,6 +504,7 @@ export function PracticumShell({
               guide={guide}
               quickInfo={quickInfo}
               arButton={arButton}
+              arHint={arHint}
               quickInfoInSheet={!mobileQuickInfoBelowScene}
               controlPanelSize={controlPanelSize}
               activeTab={activePanelTab}
@@ -512,6 +525,7 @@ export function PracticumShell({
           <DesktopSidebar
             guide={guide}
             arButton={arButton}
+            arHint={arHint}
             lksAvailability={lksAvailability}
             isLKSOpen={isLKSOpen}
             onOpenLKS={handleOpenLKS}

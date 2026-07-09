@@ -456,21 +456,12 @@ function SimulasiReaksi({
   useEffect(() => {
     if (resetSignal > lastReset.current) {
       lastReset.current = resetSignal;
-      setAnimIsiA(volumeA / 100);
-      setAnimIsiB(volumeB / 100);
       setAnimIsiHasil(0);
       setWarnaHasil("#e2e8f0");
       setGelembung(false);
       setUap(false);
     }
-  }, [resetSignal, volumeA, volumeB]);
-
-  useEffect(() => {
-    if (!sudahCampur) {
-      setAnimIsiA(volumeA / 100);
-      setAnimIsiB(volumeB / 100);
-    }
-  }, [volumeA, volumeB, sudahCampur]);
+  }, [resetSignal]);
 
   useEffect(() => {
     if (!sudahCampur) return;
@@ -495,18 +486,20 @@ function SimulasiReaksi({
   }, [sudahCampur, campurSignal, volumeA, volumeB, hasilTarget.warna, warnaAwal.warnaA]);
 
   const warnaHasilTampil = sudahCampur ? warnaHasil : "#e2e8f0";
+  const tinggiIsiA = sudahCampur ? animIsiA : volumeA / 100;
+  const tinggiIsiB = sudahCampur ? animIsiB : volumeB / 100;
 
   return (
     <>
       <TabungReaksi
         posisi={[-0.46, 0.018, 0.1]}
         warnaCairan={warnaAwal.warnaA}
-        tinggiIsi={animIsiA * 0.5}
+        tinggiIsi={tinggiIsiA * 0.5}
       />
       <TabungReaksi
         posisi={[0.46, 0.018, 0.1]}
         warnaCairan={warnaAwal.warnaB}
-        tinggiIsi={animIsiB * 0.5}
+        tinggiIsi={tinggiIsiB * 0.5}
       />
       <WadahHasil
         hasil={hasilTarget}

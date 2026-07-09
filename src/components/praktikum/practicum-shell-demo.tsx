@@ -2,13 +2,12 @@
 
 /**
  * Contoh penggunaan PracticumShell — tidak dipakai di routing produksi.
- * Referensi saat migrasi modul praktikum ke layout baru.
+ * Referensi saat migrasi modul simulasi ke layout baru.
  */
 import { useState } from "react";
 import { Box } from "lucide-react";
 import { PracticumShell } from "@/components/praktikum/practicum-shell";
 import { SimulasiInteraktifBadge } from "@/components/practicum-interaktif-badge";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 

@@ -100,20 +100,26 @@ export function PeriksaLksView({
     : 0;
 
   return (
-    <main className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6">
+    <main className="mx-auto w-full max-w-3xl px-5 pb-[var(--page-pb-safe)] pt-4 sm:px-6 sm:pt-6">
       <div className="mb-6 flex items-center gap-2">
         <Button
           render={<Link href={`/guru/modul/${moduleId}`} />}
           nativeButton={false}
           variant="ghost"
-          size="icon-sm"
+          size="icon"
+          className="min-h-11 min-w-11"
           aria-label="Kembali"
         >
           <ArrowLeft />
         </Button>
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">{namaSiswa}</h1>
+        <div className="min-w-0">
+          <h1 className="text-xl font-bold tracking-tight sm:text-2xl">
+            {namaSiswa}
+          </h1>
           <p className="text-sm text-muted-foreground">{judulModul}</p>
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            Penilaian LKS
+          </p>
         </div>
       </div>
 
@@ -168,9 +174,9 @@ export function PeriksaLksView({
             </Card>
           ))}
 
-          <div className="sticky bottom-0 flex items-center justify-between gap-3 border-t bg-background/95 py-3 backdrop-blur">
+          <div className="sticky bottom-0 flex items-center justify-between gap-3 border-t bg-background/95 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] backdrop-blur">
             <span className="text-sm text-muted-foreground">
-              Total skor:{" "}
+              Total poin:{" "}
               <span className="font-semibold text-foreground">{total}</span>
             </span>
             <Button onClick={simpanNilai} disabled={saving}>
