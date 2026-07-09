@@ -24,6 +24,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { PINTAR_NAME } from "@/lib/branding";
 
 type Role = "siswa" | "guru";
 
@@ -98,7 +99,7 @@ export function RegisterForm() {
           Daftar Akun
         </CardTitle>
         <CardDescription className="text-sm leading-relaxed">
-          Pilih peran dan buat akun untuk mulai menggunakan PintAR.
+          Pilih peran dan buat akun untuk mulai menggunakan {PINTAR_NAME}.
         </CardDescription>
       </CardHeader>
       <CardContent>

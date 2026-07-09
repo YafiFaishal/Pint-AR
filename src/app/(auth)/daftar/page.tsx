@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import { AuthShell, AuthNavLink } from "@/components/auth/auth-shell";
 import { RegisterForm } from "@/components/auth/register-form";
 
+import { PINTAR_NAME } from "@/lib/branding";
+
 export const metadata: Metadata = {
-  title: "Daftar — PintAR",
+  title: `Daftar — ${PINTAR_NAME}`,
 };
 
 export default function DaftarPage() {

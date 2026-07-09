@@ -3,6 +3,11 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { ServiceWorkerCleanup } from "@/components/sw-cleanup";
+import {
+  PINTAR_DESCRIPTION,
+  PINTAR_FULL_TITLE,
+  PINTAR_NAME,
+} from "@/lib/branding";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,9 +20,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "PintAR — Praktikum Interaktif Augmented Reality",
-  description:
-    "Laboratorium virtual berbasis WebAR. Proyeksikan alat lab 3D ke meja belajar langsung dari browser HP.",
+  title: {
+    default: PINTAR_FULL_TITLE,
+    template: `%s — ${PINTAR_NAME}`,
+  },
+  description: PINTAR_DESCRIPTION,
 };
 
 export const viewport: Viewport = {

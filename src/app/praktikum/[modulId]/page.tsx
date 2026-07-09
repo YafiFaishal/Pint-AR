@@ -5,8 +5,10 @@ import { db, modul, langkahPraktikum } from "@/db";
 import { requireUser } from "@/lib/session";
 import { PraktikumView } from "@/components/praktikum/praktikum-view";
 
+import { PINTAR_NAME } from "@/lib/branding";
+
 export const metadata: Metadata = {
-  title: "Praktikum — PintAR",
+  title: `Simulasi Eksperimen — ${PINTAR_NAME}`,
 };
 
 export default async function PraktikumPage({

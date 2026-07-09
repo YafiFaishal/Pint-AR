@@ -40,6 +40,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { SimulasiInteraktifBadge } from "@/components/practicum-interaktif-badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export function PraktikumView({
@@ -363,7 +364,7 @@ function ModeBadge({
     return <Badge className="shrink-0">Mode AR aktif</Badge>;
   }
   if (interaktif) {
-    return <Badge className="shrink-0">Praktikum Interaktif</Badge>;
+    return <SimulasiInteraktifBadge className="shrink-0" />;
   }
   if (arTersedia === null) {
     return (

@@ -1,6 +1,12 @@
 import Link from "next/link";
 import { AuthShell, AuthNavLink } from "@/components/auth/auth-shell";
 import { Button } from "@/components/ui/button";
+import {
+  PINTAR_FOOTER,
+  PINTAR_HERO_DESCRIPTION,
+  PINTAR_HERO_HEADLINE,
+  PINTAR_SUBTITLE,
+} from "@/lib/branding";
 
 const VALUE_POINTS = [
   "Tanpa instal aplikasi",
@@ -18,20 +24,19 @@ export default function Home() {
           <AuthNavLink href="/daftar">Daftar</AuthNavLink>
         </>
       }
-      footer="PintAR — Praktikum sains interaktif berbasis web."
+      footer={PINTAR_FOOTER}
     >
       <div className="flex w-full flex-col items-center gap-8 text-center sm:gap-10">
-        <p className="text-xs font-medium uppercase tracking-wider leading-snug text-muted-foreground">
-          Praktikum Interaktif Augmented Reality
+        <p className="max-w-2xl text-xs font-medium leading-snug text-muted-foreground sm:text-sm">
+          {PINTAR_SUBTITLE}
         </p>
 
         <div className="space-y-4">
           <h1 className="text-[1.75rem] font-bold leading-[1.15] tracking-tight sm:text-3xl lg:text-4xl">
-            Laboratorium sains langsung di meja belajarmu
+            {PINTAR_HERO_HEADLINE}
           </h1>
           <p className="mx-auto max-w-md text-sm leading-[1.55] text-muted-foreground sm:text-base">
-            Proyeksikan alat lab 3D lewat kamera HP, ikuti panduan langkah,
-            dan isi LKS dalam satu web app.
+            {PINTAR_HERO_DESCRIPTION}
           </p>
         </div>
 

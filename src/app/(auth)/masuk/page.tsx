@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import { AuthShell, AuthNavLink } from "@/components/auth/auth-shell";
 import { LoginForm } from "@/components/auth/login-form";
 
+import { PINTAR_NAME } from "@/lib/branding";
+
 export const metadata: Metadata = {
-  title: "Masuk — PintAR",
+  title: `Masuk — ${PINTAR_NAME}`,
 };
 
 export default function MasukPage() {

@@ -47,7 +47,7 @@ const LANGKAH: Langkah[] = [
   {
     judul: "Alat Lab Muncul!",
     deskripsi:
-      "Alat praktikum 3D akan muncul di meja. Sentuh untuk memutar, cubit untuk memperbesar.",
+      "Alat simulasi 3D akan muncul di meja. Sentuh untuk memutar, cubit untuk memperbesar.",
     ilustrasi: (
       <div className="flex h-40 items-center justify-center">
         <div className="animate-bounce">
@@ -102,7 +102,7 @@ export function OnboardingTour({
         <div>
           <h1 className="text-2xl font-bold">Siap Bereksperimen!</h1>
           <p className="mt-1 text-muted-foreground">
-            Kamu sudah paham dasarnya. Ayo coba praktikum AR pertamamu.
+            Kamu sudah paham dasarnya. Ayo coba simulasi AR pertamamu.
           </p>
         </div>
         <div className="flex w-full flex-col gap-2">

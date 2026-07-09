@@ -7,6 +7,7 @@
 import { useState } from "react";
 import { Box } from "lucide-react";
 import { PracticumShell } from "@/components/praktikum/practicum-shell";
+import { SimulasiInteraktifBadge } from "@/components/practicum-interaktif-badge";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -18,7 +19,7 @@ export function PracticumShellDemo() {
     <PracticumShell
       title="Demo PracticumShell"
       moduleId="00000000-0000-0000-0000-000000000000"
-      badge={<Badge>Praktikum Interaktif</Badge>}
+      badge={<SimulasiInteraktifBadge />}
       scene={
         <div className="flex h-full items-center justify-center bg-gradient-to-br from-slate-900 to-slate-800">
           <div

@@ -5,8 +5,10 @@ import { db, modul } from "@/db";
 import { requireUser, berandaPath } from "@/lib/session";
 import { OnboardingTour } from "@/components/onboarding/onboarding-tour";
 
+import { PINTAR_NAME } from "@/lib/branding";
+
 export const metadata: Metadata = {
-  title: "Selamat Datang — PintAR",
+  title: `Selamat Datang — ${PINTAR_NAME}`,
 };
 
 export default async function OnboardingPage() {

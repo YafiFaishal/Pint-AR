@@ -6,6 +6,7 @@ import { Box } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
+import { SimulasiInteraktifBadge } from "@/components/practicum-interaktif-badge";
 import {
   ModelViewer,
   type ArStatus,
@@ -154,7 +155,7 @@ export function LightOpticsPraktikum({
   const badge = arAktif ? (
     <Badge>Mode AR aktif</Badge>
   ) : (
-    <Badge>Praktikum Interaktif</Badge>
+    <SimulasiInteraktifBadge />
   );
 
   const scene = (

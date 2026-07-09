@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { Box } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
+import { SimulasiInteraktifBadge } from "@/components/practicum-interaktif-badge";
 import { Badge } from "@/components/ui/badge";
 import {
   ModelViewer,
@@ -106,7 +107,7 @@ export function NewtonPraktikum({
   const badge = arAktif ? (
     <Badge>Mode AR aktif</Badge>
   ) : (
-    <Badge>Praktikum Interaktif</Badge>
+    <SimulasiInteraktifBadge />
   );
 
   const scene = (
