@@ -7,6 +7,10 @@ import {
   type StatusModul,
   type KategoriModul,
 } from "@/lib/siswa-modul-utils";
+import {
+  dedupeByJudulModul,
+  skorModulKanonic,
+} from "@/lib/modul-dedupe";
 
 export type ModulDashboardItem = {
   id: string;
@@ -127,15 +131,23 @@ export async function getSiswaDashboardData(
     };
   });
 
+  const modulUnik = dedupeByJudulModul(items, (m) =>
+    skorModulKanonic({
+      jumlahLangkah: m.jumlahLangkah,
+      totalSoalLks: m.totalSoalLks,
+      aktivitas: m.dijawab,
+    }),
+  ).sort((a, b) => a.judul.localeCompare(b.judul, "id"));
+
   return {
-    modul: items,
+    modul: modulUnik,
     ringkasan: {
-      totalModul: items.length,
-      belumMulai: items.filter((m) => m.status === "Belum mulai").length,
-      lksSelesai: items.filter(
+      totalModul: modulUnik.length,
+      belumMulai: modulUnik.filter((m) => m.status === "Belum mulai").length,
+      lksSelesai: modulUnik.filter(
         (m) => m.status === "LKS selesai" || m.status === "Sudah dinilai",
       ).length,
-      sudahDinilai: items.filter((m) => m.status === "Sudah dinilai").length,
+      sudahDinilai: modulUnik.filter((m) => m.status === "Sudah dinilai").length,
     },
   };
 }

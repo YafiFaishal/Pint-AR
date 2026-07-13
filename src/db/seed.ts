@@ -11,6 +11,14 @@ import { modul, langkahPraktikum, lksTemplate } from "./schema";
 async function seed() {
   console.log("🌱 Menyemai data awal...");
 
+  const [sudahAda] = await db.select({ id: modul.id }).from(modul).limit(1);
+  if (sudahAda) {
+    console.log(
+      "↷ Database sudah berisi modul — lewati db:seed (gunakan skrip seed per-modul atau db:dedupe-modules).",
+    );
+    return;
+  }
+
   const modulNewtonId = randomUUID();
   const modulRangkaId = randomUUID();
   const modulTataSuryaId = randomUUID();

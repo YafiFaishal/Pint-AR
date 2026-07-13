@@ -7,6 +7,10 @@ import {
   type StatusModulGuru,
 } from "@/lib/guru-modul-utils";
 import type { KategoriModul } from "@/lib/siswa-modul-utils";
+import {
+  dedupeByJudulModul,
+  skorModulKanonic,
+} from "@/lib/modul-dedupe";
 
 export type ModulGuruDashboardItem = {
   id: string;
@@ -187,14 +191,22 @@ export async function getGuruDashboardData(): Promise<GuruDashboardData> {
     };
   });
 
-  const prioritasModul = items
+  const modulUnik = dedupeByJudulModul(items, (m) =>
+    skorModulKanonic({
+      jumlahLangkah: m.jumlahLangkah,
+      totalSoalLks: m.totalSoalLks,
+      aktivitas: m.lksMasuk,
+    }),
+  ).sort((a, b) => a.judul.localeCompare(b.judul, "id"));
+
+  const prioritasModul = modulUnik
     .filter((m) => m.menungguNilai > 0)
     .sort((a, b) => b.menungguNilai - a.menungguNilai)[0];
 
   return {
-    modul: items,
+    modul: modulUnik,
     ringkasan: {
-      totalModul: items.length,
+      totalModul: modulUnik.length,
       siswaAktif: siswaAktifSet.size,
       menungguDinilai: totalMenunggu,
       sudahDinilai: totalSudahDinilai,
